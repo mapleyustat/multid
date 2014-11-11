@@ -43,4 +43,4 @@ EXTRA_DIST = \
 	BrowserWin.cc BrowserWin.h \
 	PanelBrowser.cc PanelBrowser.h
 
-SUBDIRS = . t
+SUBDIRS = . t_guiFLTK

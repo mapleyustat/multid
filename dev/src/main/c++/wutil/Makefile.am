@@ -2,17 +2,6 @@
 
 lib_LTLIBRARIES = libwutil.la
 
-libwutil_la_CXXFLAGS =
-if DEBUG
-GCC_WARNING_CXXFLAGS_ = -std=c++98 -pedantic -Wall -Wextra -Weffc++ \
-	-Wctor-dtor-privacy -Wno-deprecated -Wstrict-null-sentinel \
-	-Wno-non-template-friend -Wno-pmf-conversions -Wsign-promo \
-	-Wshadow -Wpointer-arith -Wcast-qual -Wcast-align \
-	-Wwrite-strings -Wconversion -Wredundant-decls \
-	-Winline -Wno-invalid-offsetof -Wold-style-cast \
-	-Woverloaded-virtual -Wsynth
-libwutil_la_CXXFLAGS += $(GCC_WARNING_CXXFLAGS_)
-endif
 libwutil_la_SOURCES = \
 	ADTADV.cc ADTADV.h \
 	BlockTri1.cc BlockTri1.h \
@@ -41,6 +30,18 @@ libwutil_la_SOURCES = \
 	VectorNArray.hP VectorNArray.ccP \
 	VectorN.hP VectorN.ccP
 
+AM_CXXFLAGS =
+if DEBUG
+GCC_WARNING_CXXFLAGS_ = -std=c++98 -pedantic -Wall -Wextra -Weffc++ \
+	-Wctor-dtor-privacy -Wno-deprecated -Wstrict-null-sentinel \
+	-Wno-non-template-friend -Wno-pmf-conversions -Wsign-promo \
+	-Wshadow -Wpointer-arith -Wcast-qual -Wcast-align \
+	-Wwrite-strings -Wconversion -Wredundant-decls \
+	-Winline -Wno-invalid-offsetof -Wold-style-cast \
+	-Woverloaded-virtual -Wsynth
+AM_CXXFLAGS += $(GCC_WARNING_CXXFLAGS_)
+endif
+
 EXTRA_DIST =
 
-SUBDIRS = . t
+SUBDIRS = . t_wutil

@@ -73,15 +73,15 @@ AC_CONFIG_HEADER([config.h])
 AC_CONFIG_FILES([
 	Makefile
 	wutil/Makefile
-	wutil/t/Makefile
+	wutil/t_wutil/Makefile
 	guiFLTK/Makefile
-	guiFLTK/t/Makefile
+	guiFLTK/t_guiFLTK/Makefile
 	graphGL/Makefile
-	graphGL/t/Makefile
+	graphGL/t_graphGL/Makefile
 	multid/Makefile
 	multid/CharPlot/Makefile
 	multid/Display/Makefile
-	multid/t/Makefile
+	multid/t_multid/Makefile
 ])
 AC_OUTPUT
 

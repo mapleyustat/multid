@@ -52,4 +52,4 @@ EXTRA_DIST = \
 	multid.txt \
 	BUGS
 
-SUBDIRS = . t CharPlot Display
+SUBDIRS = . t_multid CharPlot Display

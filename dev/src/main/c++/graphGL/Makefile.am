@@ -40,4 +40,4 @@ endif
 
 EXTRA_DIST =
 
-SUBDIRS = . t
+SUBDIRS = . t_graphGL
