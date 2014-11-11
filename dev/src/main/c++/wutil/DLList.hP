@@ -1,0 +1,222 @@
+#ifndef _<T>DLList_h
+#define _<T>DLList_h
+
+#include <<T>.h>
+#include "Pix.h"
+
+// NOTE:  This list class is adapted from the one described by
+// Lippman in his second edition of the C++Primer.  The handling
+// of references is adapted from DLList.{h,cc}P in the GNU C++ library.
+
+// The function
+//
+// 	int operator==(const <T> &, const <T> &)
+//
+// must be implemented for the class <T>.
+
+// If the elements of type <T> on the list are never to be changed,
+// then the <T> member of <T>DLListNode should be made const,
+// as should the <T> & arguments to the following functions:
+// <T>DLListNode::<T>DLListNode() (both kinds); <T>DLList::<T>DLList();
+// and <T>DLList::append and <T>DLList::prepend with <T> & arguments.
+
+class <T>DLListNode
+{
+private:
+	<T>DLListNode(<T> & obj_);
+	<T>DLListNode(<T> & obj_,
+		<T>DLListNode * next_, <T>DLListNode * prev_);
+
+	static void reference(<T>DLListNode * node);
+	static void dereference(<T>DLListNode * node);
+
+	<T> &obj;
+	<T>DLListNode *next;
+	<T>DLListNode *prev;
+	short ref;
+
+	friend class <T>DLList;
+};
+
+inline
+<T>DLListNode::<T>DLListNode(<T> & obj_)
+	: obj(obj_),
+	  ref(1)
+{
+}
+
+inline
+<T>DLListNode::<T>DLListNode(<T> & obj_,
+	<T>DLListNode * next_, <T>DLListNode * prev_)
+	: obj(obj_),
+	  next(next_),
+	  prev(prev_),
+	  ref(1)
+{
+}
+
+inline void
+<T>DLListNode::reference(<T>DLListNode * node)
+{
+	if (node != 0)
+		++node->ref;
+}
+
+inline void
+<T>DLListNode::dereference(<T>DLListNode * node)
+{
+	while (node != 0 && --node->ref == 0) {
+		<T>DLListNode *n = node->next;
+		if (n != 0)
+			n->prev = node->prev;
+		delete node;
+		node = n;
+	}
+}
+
+class <T>DLList
+{
+public:
+	<T>DLList(void);
+	<T>DLList(<T> & obj);
+	<T>DLList(const <T>DLList & list);
+	~<T>DLList(void);
+	<T>DLList & operator = (const <T>DLList & list);
+
+	int null(void) const;
+
+	void empty(void);
+	void append(<T> & obj);
+	void append(const <T>DLList & list);
+	void prepend(<T> & obj);
+	void prepend(const <T>DLList & list);
+	void del(const <T> & obj);		// delete all nodes with obj
+	void del_last(const <T> & obj);		// delete the last node with obj
+
+	Pix first(void) const;
+	Pix last(void) const;
+	void next(Pix & p) const;
+	void prev(Pix & p) const;
+	const <T> & operator() (Pix p) const;
+	<T> & operator() (Pix p);
+
+private:
+	<T>DLListNode *head;
+	<T>DLListNode *tail;
+};
+
+inline
+<T>DLList::<T>DLList(void)
+	: head(0),
+	  tail(0)
+{
+}
+
+inline
+<T>DLList::<T>DLList(<T> & obj)
+	: head(new <T>DLListNode(obj, 0, 0)),
+	  tail(head)
+{
+}
+
+inline
+<T>DLList::<T>DLList(const <T>DLList & list)
+	: head(list.head),
+	  tail(list.tail)
+{
+	<T>DLListNode::reference(list.head);
+}
+
+inline
+<T>DLList::~<T>DLList(void)
+{
+	<T>DLListNode::dereference(head);
+}
+
+inline <T>DLList &
+<T>DLList::operator = (const <T>DLList & list)
+{
+	if (this != &list) {
+		<T>DLListNode::dereference(head);
+		<T>DLListNode::reference(list.head);
+		head = list.head;
+		tail = list.tail;
+	}
+	return *this;
+}
+
+inline int
+<T>DLList::null(void) const
+{
+	return head == 0;
+}
+
+inline void
+<T>DLList::empty(void)
+{
+	<T>DLListNode::dereference(head);
+	head = 0;
+	tail = 0;
+}
+
+inline void
+<T>DLList::append(<T> & obj)
+{
+	<T>DLListNode *node = tail;
+	tail = new <T>DLListNode(obj, 0, node);
+	if (node == 0)
+		head = tail;
+	else
+		node->next = tail;
+}
+
+inline void
+<T>DLList::prepend(<T> & obj)
+{
+	<T>DLListNode *node = head;
+	head = new <T>DLListNode(obj, node, 0);
+	if (node == 0)
+		tail = head;
+	else
+		node->prev = head;
+}
+
+inline Pix
+<T>DLList::first(void) const
+{
+	return Pix(head);
+}
+
+inline Pix
+<T>DLList::last(void) const
+{
+	return Pix(tail);
+}
+
+inline void
+<T>DLList::next(Pix & p) const
+{
+	if (p != 0)
+		p = Pix(((<T>DLListNode *) p)->next);
+}
+
+inline void
+<T>DLList::prev(Pix & p) const
+{
+	if (p != 0)
+		p = Pix(((<T>DLListNode *) p)->prev);
+}
+
+inline const <T> &
+<T>DLList::operator() (Pix p) const
+{
+	return ((<T>DLListNode *) p)->obj;
+}
+
+inline <T> &
+<T>DLList::operator() (Pix p)
+{
+	return ((<T>DLListNode *) p)->obj;
+}
+
+#endif

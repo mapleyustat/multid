@@ -1,0 +1,5 @@
+1. The #defines in Button.h should be replaced by with enums. (?)
+
+2. The various "int active(void) const" routines should inherit from
+Fl_Widget, but they don't.  (See the commented-out code that uses
+this routine in multid/SliderView.cc.)

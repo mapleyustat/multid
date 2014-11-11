@@ -1,0 +1,193 @@
+// BlockTriN.hP:
+//
+// This file defines block-tridiagonal matrices.
+//
+// To use this class to define, e.g., 7-component block
+// triangular vectors and matrices, create the following files:
+//
+
+// BlockTri7.h:
+
+//	#ifndef _BlockTri7_h
+//	#define _BlockTri7_h
+//
+//	#include "Vector7Array.h"
+//
+//	typedef Vector7Array BlockTriVector7;
+//
+//	#define BlockTriVector BlockTriVector7
+//	#define BlockTriMatrix BlockTriMatrix7
+//	#define MatrixNArray Matrix7Array
+//
+//	#include "BlockTriN.hP"
+//
+//	#undef BlockTriVector
+//	#undef BlockTriMatrix
+//	#undef MatrixNArray
+//
+//	#endif /* _BlockTri7_h */
+
+// BlockTri7.cc:
+
+//	#include "BlockTri7.h"
+//
+//	#define BlockTriVector BlockTriVector7
+//	#define BlockTriMatrix BlockTriMatrix7
+//	#define MatrixN Matrix7
+//	#define MatrixNArray Matrix7Array
+//	#define FactorMatrixN FactorMatrix7
+//
+//	#include "BlockTriN.ccP"
+
+// NOTE:  We use the C convention on indexing.  Thus the first equation
+// has index 0, and the block arrangement is as follows:
+//
+//	D(0)	U(1)
+//	L(0)	D(1)	U(2)
+//		L(1)	D(2)	U(3)
+//			...	...	...
+//						U(n-1)
+//					L(n-2)	D(n-1)
+//
+// where n := n_eqn is the number of equation blocks to be solved.
+// Thus the size of the matrix is n_eqn times the block size.
+//
+// In the solve() routine, the solution vector x has size n_eqn, and
+// the solution is put into elements x(0), ..., x(n_eqn-1).  Similarly,
+// the right-hand side vector y has size n_eqn.
+//
+// Also, L, D, and U are arrays of length n_eqn, but the blocks not
+// indicated in the diagram above are ignored by solve().
+//
+// In contrast, the solve_periodic() routine assumes that the matrix is
+//
+//	D(0)	U(1)				L(n-1)
+//	L(0)	D(1)	U(2)
+//		L(1)	D(2)	U(3)
+//			...	...	...
+//						U(n-1)
+//	U(0)				L(n-2)	D(n-1)
+//
+// Similarly, the solve_lower() routine assumes that the matrix is
+//
+//	D(0)
+//	L(0)	D(1)
+//	LL(0)	L(1)	D(2)
+//		...	...	...
+//			LL(n-4)	L(n-3)	D(n-2)
+//				LL(n-3)	L(n-2)	D(n-1)
+//
+// where the storage for the lower-lower diagonal LL is actually
+// the same as that for U.
+
+class BlockTriMatrix
+{
+public:
+	BlockTriMatrix(void);
+	BlockTriMatrix(int n_eqn__ /* , bool is_upper_triangular = false */);
+	BlockTriMatrix(int n_eqn__, MatrixNArray &upper_diagonal,
+		MatrixNArray &diagonal, MatrixNArray &lower_diagonal);
+	~BlockTriMatrix(void);
+
+	int n_eqn(void) const;
+
+	MatrixNArray &upper_diagonal(void);
+	const MatrixNArray &upper_diagonal(void) const;
+	MatrixNArray &diagonal(void);
+	const MatrixNArray &diagonal(void) const;
+	MatrixNArray &lower_diagonal(void);
+	const MatrixNArray &lower_diagonal(void) const;
+	MatrixNArray &lower_lower_diagonal(void);
+	const MatrixNArray &lower_lower_diagonal(void) const;
+
+private:
+	/* bool is_upper_triangular; */
+	int n_eqn_;
+	MatrixNArray upper, diag, lower;
+};
+
+void solve(BlockTriMatrix &M, BlockTriVector &x, BlockTriVector &y);
+void solve_periodic(BlockTriMatrix &M, BlockTriVector &x, BlockTriVector &y);
+void solve_lower(BlockTriMatrix &M, BlockTriVector &x, BlockTriVector &y);
+
+inline
+BlockTriMatrix::BlockTriMatrix(void)
+	: n_eqn_(0),
+	  upper(),
+	  diag(),
+	  lower()
+{
+}
+
+inline
+BlockTriMatrix::BlockTriMatrix(int n_eqn__)
+	: n_eqn_(n_eqn__),
+	  upper(n_eqn__),
+	  diag(n_eqn__),
+	  lower(n_eqn__)
+{
+}
+
+inline
+BlockTriMatrix::BlockTriMatrix(int n_eqn__, MatrixNArray &upper_diag,
+		MatrixNArray &diag_, MatrixNArray &lower_diag)
+	: n_eqn_(n_eqn__),
+	  upper(upper_diag),
+	  diag(diag_),
+	  lower(lower_diag)
+{
+}
+
+inline int
+BlockTriMatrix::n_eqn(void) const
+{
+	return n_eqn_;
+}
+
+inline MatrixNArray &
+BlockTriMatrix::upper_diagonal(void)
+{
+	return upper;
+}
+
+inline const MatrixNArray &
+BlockTriMatrix::upper_diagonal(void) const
+{
+	return upper;
+}
+
+inline MatrixNArray &
+BlockTriMatrix::diagonal(void)
+{
+	return diag;
+}
+
+inline const MatrixNArray &
+BlockTriMatrix::diagonal(void) const
+{
+	return diag;
+}
+
+inline MatrixNArray &
+BlockTriMatrix::lower_diagonal(void)
+{
+	return lower;
+}
+
+inline const MatrixNArray &
+BlockTriMatrix::lower_diagonal(void) const
+{
+	return lower;
+}
+
+inline MatrixNArray &
+BlockTriMatrix::lower_lower_diagonal(void)
+{
+	return upper;
+}
+
+inline const MatrixNArray &
+BlockTriMatrix::lower_lower_diagonal(void) const
+{
+	return upper;
+}

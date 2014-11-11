@@ -1,0 +1,45 @@
+# This is a git ignore file.
+
+# build files
+*.o
+Makefile
+.deps
+.libs
+# autoconf, automake, and libtool files
+aclocal.m4
+autom4te.cache
+build-aux
+config.h
+config.h.in
+config.log
+config.status
+configure
+INSTALL
+libtool
+libtool.m4
+lt~obsolete.m4
+ltoptions.m4
+ltsugar.m4
+ltversion.m4
+Makefile.in
+stamp-h1
+# tags files
+tags
+# "make check" detritus
+*.trs
+*.log
+# executables
+tADTADV
+tBlockTri2
+tBlockTri2low
+tBlockTri2per
+tVector1
+tVector2
+tVector3
+tVector4
+tlabel
+tpolyroot
+ttrapfpe
+t
+charplot
+display

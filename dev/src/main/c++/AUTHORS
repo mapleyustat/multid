@@ -1,0 +1,14 @@
+The multid multidimensional graphics library was designed and implemented by
+
+	Dan Marchesin		<marchesi@impa.br>
+	Bradley J. Plohr	<plohr@lanl.gov>
+
+The original GUI and graphics interface libraries guiXV (built over XVew)
+and graphXGL (built over XGL) were designed and implemented by B. Plohr.
+
+The current GUI and graphics interface libraries guiFLTK (built over FLTK)
+and graphGL (built over OpenGL) were implemented by B. Plohr and
+
+	Gustavo Hime		<hime@users.sourceforge.net>
+
+The wutil library, which contains utility software, was written by B. Plohr.

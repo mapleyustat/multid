@@ -1,0 +1,107 @@
+Build Instructions for MultiD
+-----------------------------
+
+To build MultiD, proceed as follows.
+
+0. Ensure that the following software packages are installed on the
+system.
+
+rpm-based systems:
+
+	fltk-1.1.8-1
+	fltk-devel-1.1.8-1
+	mesa-libGL-7.1-0.31
+	mesa-libGL-devel-7.1-0.31
+	mesa-libGLU-7.1-0.31
+	mesa-libGLU-devel-7.1-0.31
+	libX11-1.1.4-1
+	libX11-devel-1.1.4-1
+
+apt-based systems:
+
+	fltk-1.1.9
+	fltk-devel-1.1.9
+	libgl1-mesa-glx-6.5.2-3
+	libgl1-mesa-dev-6.5.2-3
+	libglu1-mesa-6.5.2-3
+	libglu1-mesa-dev-6.5.2-3
+	libx11-6-1.1.1-1
+	libx11-dev-1.1.1-1
+
+(Later versions presumably are adequate.)
+
+1. Extract the source code and change to the directory created (the
+"top source directory").  For example, run the shell commands
+
+	tar zxf multid-2008-07-30.tar.gz
+	cd multid-2008-07-30
+
+2. Run the command
+
+	./configure
+
+3. Run the command
+
+	make
+
+This command creates the support libraries.
+
+4. Run the command
+
+	make check
+
+This command creates and run various test programs.
+
+5. To clean the source directories, run the command
+
+	make clean
+
+Maintenance Instructions for MultiD
+-----------------------------------
+
+0. Ensure that the following packages are installed on the system.
+
+	autoconf-2.60
+	automake-1.9.6
+
+(Later versions presumably are adequate.)
+
+1. If changes are made to "configure.ac" (e.g., the version number is changed),
+run the command
+
+	make Makefile
+
+in the top source directory.  If this command fails, run the commands
+
+	./autogen.sh
+	./configure
+
+2. If changes are made to "Makefile.am" in the top source directory, run the
+command
+
+	make Makefile
+
+in the top source directory.
+
+3. To clean the source tree (i.e., remove libraries, object files, etc.),
+run the command
+
+	make clean
+
+in the top source directory.  To thoroughly clean the source tree (i.e.,
+remove "Makefile"s, dependency files, etc.), run the command
+
+	make distclean
+
+Remark:  After a thorough cleaning, the command
+
+	./configure
+
+must be rerun.
+
+4. To create a compressed archive of the distribution, run the command
+
+	make dist
+
+in the top source directory.  The resulting gzipped tar file is placed
+in the top source directory.

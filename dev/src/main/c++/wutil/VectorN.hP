@@ -1,0 +1,501 @@
+// VectorN.hP:
+//
+// This file defines N-component vectors and matrices.
+// To use this class to define, e.g., 7-component vectors and matrices,
+// create the following files:
+
+// Vector7.h:
+
+//	#ifndef _Vector7_h
+//	#define _Vector7_h
+//
+//	#define VectorN_N_COMPS 7
+//	#define VectorN Vector7
+//	#define MatrixN Matrix7
+//	#define FactorMatrixN FactorMatrix7
+//
+//	#include <VectorN.hP>
+//
+//	#undef VectorN_N_COMPS
+//	#undef VectorN
+//	#undef MatrixN
+//	#undef FactorMatrixN
+//
+//	#endif /* _Vector7_h */
+
+// Vector7.cc:
+
+//	#include <Vector7.h>
+//
+//	#define VectorN Vector7
+//	#define MatrixN Matrix7
+//	#define FactorMatrixN FactorMatrix7
+//
+//	#include <VectorN.ccP>
+
+//
+// Control macros:
+//
+//	VectorN_NO_CHECKING	-- turn off range checking
+
+
+#include <cmath>
+#include <iostream>
+
+class MatrixN;
+class FactorMatrixN;
+
+class VectorN
+{
+public:
+	VectorN(void);
+	VectorN(const VectorN &vector);
+	~VectorN(void);
+	VectorN &operator=(const VectorN &vector);
+	VectorN &zero(void);
+
+	static int n_comps(void);
+	static void range_check(int comp);
+
+	double &operator()(int comp);
+	double operator()(int comp) const;
+	double &component(int comp);
+	double component(int comp) const;
+
+	VectorN &operator*=(double s);
+	VectorN &operator+=(const VectorN &b);
+	VectorN &operator-=(const VectorN &b);
+
+	class RangeViolation : public std::exception { };
+
+private:
+	double v[VectorN_N_COMPS];
+
+	friend inline VectorN operator*(const MatrixN &matrix,
+		const VectorN &vector);
+	friend inline double operator*(const VectorN &a, const VectorN &b);
+	friend class MatrixN;	// for row_vector() and column_vector()
+};
+
+inline VectorN operator*(double s, const VectorN &a);
+inline VectorN operator+(const VectorN &a, const VectorN &b);
+inline VectorN operator-(const VectorN &a, const VectorN &b);
+inline double operator*(const VectorN &a, const VectorN &b);
+
+std::istream &operator>>(std::istream &is, VectorN &vector);
+std::ostream &operator<<(std::ostream &os, const VectorN &vector);
+
+inline int
+VectorN::n_comps(void)
+{
+	return VectorN_N_COMPS;
+}
+
+#ifndef VectorN_NO_CHECKING
+
+inline void
+VectorN::range_check(int comp)
+{
+	if (comp < 0 || comp >= VectorN::n_comps())
+		throw RangeViolation();
+}
+
+#else /* ! VectorN_NO_CHECKING */
+
+inline void
+VectorN::range_check(int /* comp */)
+{
+}
+
+#endif /* VectorN_NO_CHECKING */
+
+inline
+VectorN::VectorN(void)
+{
+}
+
+inline
+VectorN::VectorN(const VectorN &vector)
+{
+	for (int i = 0; i < VectorN_N_COMPS; i++)
+		v[i] = vector.v[i];
+}
+
+inline
+VectorN::~VectorN(void)
+{
+}
+
+inline VectorN &
+VectorN::operator=(const VectorN &vector)
+{
+	for (int i = 0; i < VectorN_N_COMPS; i++)
+		v[i] = vector.v[i];
+	return *this;
+}
+
+inline VectorN &
+VectorN::zero(void)
+{
+	for (int i = 0; i < VectorN_N_COMPS; i++)
+		v[i] = 0.0;
+	return *this;
+}
+
+inline double &
+VectorN::operator()(int comp)
+{
+	range_check(comp);
+	return v[comp];
+}
+
+inline double
+VectorN::operator()(int comp) const
+{
+	range_check(comp);
+	return v[comp];
+}
+
+inline double &
+VectorN::component(int comp)
+{
+	range_check(comp);
+	return v[comp];
+}
+
+inline double
+VectorN::component(int comp) const
+{
+	range_check(comp);
+	return v[comp];
+}
+
+inline VectorN &
+VectorN::operator*=(double s)
+{
+	for (int i = 0; i < VectorN_N_COMPS; i++)
+		v[i] *= s;
+	return *this;
+}
+
+inline VectorN &
+VectorN::operator+=(const VectorN &b)
+{
+	for (int i = 0; i < VectorN_N_COMPS; i++)
+		v[i] += b.v[i];
+	return *this;
+}
+
+inline VectorN &
+VectorN::operator-=(const VectorN &b)
+{
+	for (int i = 0; i < VectorN_N_COMPS; i++)
+		v[i] -= b.v[i];
+	return *this;
+}
+
+inline VectorN
+operator*(double s, const VectorN &a)
+{
+	VectorN vtmp(a);
+	vtmp *= s;
+	return vtmp;
+}
+
+inline VectorN
+operator+(const VectorN &a, const VectorN &b)
+{
+	VectorN vtmp(a);
+	vtmp += b;
+	return vtmp;
+}
+
+inline VectorN
+operator-(const VectorN &a, const VectorN &b)
+{
+	VectorN vtmp(a);
+	vtmp -= b;
+	return vtmp;
+}
+
+inline double
+operator*(const VectorN &a, const VectorN &b)
+{
+	double inner_product = 0.;
+	for (int i = 0; i < VectorN_N_COMPS; i++)
+		inner_product += a.v[i]*b.v[i];
+	return inner_product;
+}
+
+class MatrixN
+{
+public:
+	MatrixN(void);
+	MatrixN(const MatrixN &matrix);
+	~MatrixN(void);
+	MatrixN &operator=(const MatrixN &matrix);
+	MatrixN &zero(void);
+
+	static void range_check(int row, int col);
+
+	double &operator()(int row, int col);
+	double operator()(int row, int col) const;
+
+	VectorN row_vector(int i);
+	VectorN column_vector(int j);
+
+	MatrixN &operator*=(double s);
+	MatrixN &operator+=(const MatrixN &b);
+	MatrixN &operator-=(const MatrixN &b);
+
+	MatrixN &equals_multiple_of_identity(double s);
+	MatrixN &add_multiple_of_identity(double s);
+
+	void eigen(VectorN &evals, MatrixN &evects);
+
+	class RangeViolation : public std::exception { };
+	class NotImplemented : public std::exception { };
+
+private:
+	double m[VectorN_N_COMPS][VectorN_N_COMPS];
+
+	friend inline VectorN operator*(const MatrixN &matrix,
+		const VectorN &vector);
+	friend inline MatrixN operator*(const MatrixN &a, const MatrixN &b);
+	friend MatrixN inverse(const MatrixN &matrix);
+	friend MatrixN transpose(const MatrixN &matrix);
+	friend MatrixN deviator(const MatrixN &matrix);
+	friend double trace(const MatrixN &matrix);
+	friend double matrix_one_norm(const MatrixN &matrix);
+	friend double matrix_infinity_norm(const MatrixN &matrix);
+};
+
+inline MatrixN operator*(double s, const MatrixN &a);
+inline MatrixN operator+(const MatrixN &a, const MatrixN &b);
+inline MatrixN operator-(const MatrixN &a, const MatrixN &b);
+inline VectorN operator*(const MatrixN &matrix, const VectorN &vector);
+inline MatrixN operator*(const MatrixN &a, const MatrixN &b);
+
+MatrixN inverse(const MatrixN &matrix);
+MatrixN transpose(const MatrixN &matrix);
+MatrixN deviator(const MatrixN &matrix);
+double trace(const MatrixN &matrix);
+
+double matrix_one_norm(const MatrixN &matrix);
+double matrix_infinity_norm(const MatrixN &matrix);
+
+std::istream &operator>>(std::istream &is, MatrixN &matrix);
+std::ostream &operator<<(std::ostream &os, const MatrixN &matrix);
+
+#ifndef VectorN_NO_CHECKING
+
+inline void
+MatrixN::range_check(int row, int col)
+{
+	if (row < 0 || row >= VectorN::n_comps())
+		throw RangeViolation();
+	if (col < 0 || col >= VectorN::n_comps())
+		throw RangeViolation();
+}
+
+#else // ! VectorN_NO_CHECKING //
+
+inline void
+MatrixN::range_check(int, int)
+{
+}
+
+#endif // VectorN_NO_CHECKING //
+
+inline
+MatrixN::MatrixN(void)
+{
+}
+
+inline
+MatrixN::MatrixN(const MatrixN &matrix)
+{
+	int i, j;
+	for (i = 0; i < VectorN_N_COMPS; i++)
+		for (j = 0; j < VectorN_N_COMPS; j++)
+			m[i][j] = matrix.m[i][j];
+}
+
+inline
+MatrixN::~MatrixN(void)
+{
+}
+
+inline MatrixN &
+MatrixN::operator=(const MatrixN &matrix)
+{
+	int i, j;
+	for (i = 0; i < VectorN_N_COMPS; i++)
+		for (j = 0; j < VectorN_N_COMPS; j++)
+			m[i][j] = matrix.m[i][j];
+	return *this;
+}
+
+inline MatrixN &
+MatrixN::zero(void)
+{
+	int i, j;
+	for (i = 0; i < VectorN_N_COMPS; i++)
+		for (j = 0; j < VectorN_N_COMPS; j++)
+			m[i][j] = 0.;
+	return *this;
+}
+
+inline MatrixN &
+MatrixN::operator*=(double s)
+{
+	int i, j;
+	for (i = 0; i < VectorN_N_COMPS; i++)
+		for (j = 0; j < VectorN_N_COMPS; j++)
+			m[i][j] *= s;
+	return *this;
+}
+
+inline MatrixN &
+MatrixN::operator+=(const MatrixN &b)
+{
+	int i, j;
+	for (i = 0; i < VectorN_N_COMPS; i++)
+		for (j = 0; j < VectorN_N_COMPS; j++)
+			m[i][j] += b.m[i][j];
+	return *this;
+}
+
+inline MatrixN &
+MatrixN::operator-=(const MatrixN &b)
+{
+	int i, j;
+	for (i = 0; i < VectorN_N_COMPS; i++)
+		for (j = 0; j < VectorN_N_COMPS; j++)
+			m[i][j] -= b.m[i][j];
+	return *this;
+}
+
+inline MatrixN &
+MatrixN::equals_multiple_of_identity(double s)
+{
+	int i, j;
+	for (i = 0; i < VectorN_N_COMPS; i++)
+		for (j = 0; j < VectorN_N_COMPS; j++)
+			if (i == j)
+				m[i][j] = s;
+			else
+				m[i][j] = 0.;
+	return *this;
+}
+
+inline MatrixN &
+MatrixN::add_multiple_of_identity(double s)
+{
+	for (int i = 0; i < VectorN_N_COMPS; i++)
+		m[i][i] += s;
+	return *this;
+}
+
+inline MatrixN
+operator*(double s, const MatrixN &a)
+{
+	MatrixN mtmp(a);
+	mtmp *= s;
+	return mtmp;
+}
+
+inline MatrixN
+operator+(const MatrixN &a, const MatrixN &b)
+{
+	MatrixN mtmp(a);
+	mtmp += b;
+	return mtmp;
+}
+
+inline MatrixN
+operator-(const MatrixN &a, const MatrixN &b)
+{
+	MatrixN mtmp(a);
+	mtmp -= b;
+	return mtmp;
+}
+
+inline VectorN
+operator*(const MatrixN &matrix, const VectorN &vector)
+{
+	int i, j;
+	VectorN vtmp;
+	vtmp.zero();
+	for (i = 0; i < VectorN_N_COMPS; i++)
+		for (j = 0; j < VectorN_N_COMPS; j++)
+			vtmp.v[i] += matrix.m[i][j] * vector.v[j];
+	return vtmp;
+}
+
+inline MatrixN
+operator*(const MatrixN &a, const MatrixN &b)
+{
+	int i, j, k;
+	MatrixN mtmp;
+	mtmp.zero();
+	for (i = 0; i < VectorN_N_COMPS; i++)
+		for (j = 0; j < VectorN_N_COMPS; j++)
+			for (k = 0; k < VectorN_N_COMPS; k++)
+				mtmp.m[i][j] += a.m[i][k] * b.m[k][j];
+	return mtmp;
+}
+
+class FactorMatrixN
+{
+public:
+	FactorMatrixN(void);
+	~FactorMatrixN(void);
+	FactorMatrixN(const FactorMatrixN &F);
+	FactorMatrixN &operator=(const FactorMatrixN &F);
+
+private:
+	MatrixN lu_; // Matrix storage that holds LU decomposition.
+	int index_[VectorN_N_COMPS]; // Row permutation indices.
+
+	friend FactorMatrixN factor(const MatrixN &matrix);
+	friend VectorN solve(const FactorMatrixN &F, const VectorN &vector);
+	friend std::ostream &operator<<(std::ostream &os,
+		const FactorMatrixN &F);
+};
+
+FactorMatrixN factor(const MatrixN &matrix);
+VectorN solve(const FactorMatrixN &F, const VectorN &vector);
+MatrixN solve(const FactorMatrixN &F, const MatrixN &matrix);
+
+std::ostream &operator<<(std::ostream &os, const FactorMatrixN &F);
+
+inline
+FactorMatrixN::FactorMatrixN(void)
+	: lu_()
+{
+	for (int i = 0; i < VectorN_N_COMPS; i++)
+		index_[i] = 0;
+}
+
+inline
+FactorMatrixN::~FactorMatrixN(void)
+{
+}
+
+inline
+FactorMatrixN::FactorMatrixN(const FactorMatrixN &F)
+	: lu_(F.lu_)
+{
+	for (int i = 0; i < VectorN_N_COMPS; i++)
+		index_[i] = F.index_[i];
+}
+
+inline FactorMatrixN &
+FactorMatrixN::operator=(const FactorMatrixN &F)
+{
+	lu_ = F.lu_;
+	for (int i = 0; i < VectorN_N_COMPS; i++)
+		index_[i] = F.index_[i];
+	return *this;
+}

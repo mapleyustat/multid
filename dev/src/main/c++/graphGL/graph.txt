@@ -1,0 +1,124 @@
+Graph Library:
+-------------
+
+The graphGL library is an interface to a graphics library.
+
+The present implementation uses the OpenGL library.
+
+The public class hierarchy is as follows:
+
+        Graphics
+        GWin
+                GWin2d
+                GWin3d
+                MultiWin
+        Color
+        ColorArray
+        CoordsArray
+        Hook2d
+        Hook3d
+        Prims
+            PrimsPS
+        Raster
+        SubWin
+                SubWin2d
+                SubWin3d
+        Trans
+                Trans2d
+                Trans3d
+        Viewport
+
+The basic use of this package is to create a GWin (either 2d or 3d) and
+use Prims to draw in its canvas.
+
+Graphics:
+--------
+In this implementation, a dummy file.
+
+GWin:
+----
+Base class for graphics output windows.  Implements basic functionalities, such
+as creating an OpenGL context and attaching it, and defines virtual functions
+required for the PostScript saving routines to work properly.
+
+GWin2d:
+------
+Implements a single viewport window for 2d graphics.
+
+GWin3d:
+------
+Implements a single viewport window for 3d graphics.
+
+MultiWin:
+--------
+Implements a graphical output window capable of handling multiple viewports.
+Each viewport is a separate object derived from SubWin.  All viewports use the
+MultiWin's Prims object.
+
+Color:
+-----
+Contains an RGB value.  Can be constructed in a variety of ways.
+
+ColorArray:
+----------
+Implements an array of Color objects.
+
+CoordsArray:
+-----------
+Implements a display list, containing Vertex2? or Vertex3? commands.
+
+Hook2d:
+------
+Callback procedures for input from a GWin2d.
+
+Hook3d:
+------
+Callback procedures for input from a GWin3d.
+
+Prims:
+-----
+Implements drawing facilities.  Abstracts glBegin/glEnd primitive calls.  Text
+is currently carried out using GLUT routines, but this could be improved (GLUT
+is a huge package to be used just for that).
+
+PrimsPS:
+-------
+Implements the same behavior as the Prims class, only creating a PostScript
+file instead of rendering on-screen.
+
+Raster:
+------
+Inherited from the XGL design.  Used to manage base level viewport and Visual
+info.
+
+SubWin:
+------
+Abstract class.  Implements a viewport inside a MultiWin.  Derived classes
+SubWin2d and SubWin3d are analogous to GWin2d and GWin3d.  Aspect ratio of each
+viewport is defined by their owners aspect ratio and their vdc_location
+bounding box.
+
+SubWin2d:
+--------
+2d Viewport for MultiWin.  Behaves similarly to GWin2d.
+
+SubWin3d:
+--------
+3d Viewport for MultiWin.  Behaves similarly to GWin3d.
+
+Trans:
+-----
+Encapsulates two transformation matrices, performs vdc->wc transformations,
+and manages model/view transformations.
+
+Trans2d:
+-------
+
+Trans3d:
+-------
+
+Viewport:
+--------
+Abstracts a rectangle in window/screen coordinates. Y grows down.  Mapping to
+vdc and glViewport calls (both using Y growing up) are done here.
+

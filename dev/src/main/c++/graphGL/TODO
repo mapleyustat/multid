@@ -1,0 +1,12 @@
+0. Cannot use HOME key to reset the transformation because the range
+dialogues intercept key events (see GWin2d.cc).
+
+1. Set glClearColor().
+
+2. Get Aux library code from ftp://sgigate.sgi.com/pub/opengl/opengl.tar.Z.
+
+3. Doesn't Color::Color(const Color &color, double intensity) need a
+"nearest pure" calculation?  (Also put in XGL version.)
+
+4. Does double buffering require color index mode under X?
+Note that RGBA mode is set in Raster.cc.

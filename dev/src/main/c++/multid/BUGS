@@ -1,0 +1,18 @@
+1. There are too many inlines; clean this up.
+
+2. The "MultiPolyline" and "MultiPolygon" classes construct
+"CoordsArray"s that contain pointers to the coordinate storage of the
+"Polylines" and "Polygons".  If, for example, a "Polygon" on a "MultiPolygon"
+has its color changed, and if this "Polygon" is a duplicate, then the
+"Polygon" is first ``made actual,'' i.e., a copy is made.  This means
+that the "CoordsArray" now points to old storage.  The "MultiPolygon"
+cannot ``know'' that it must "update()" the "CoordsArray" (the member
+"modified" has not been set to 1).
+
+In other words, it's a potential disaster if a "Polygon" on a "MultiPolygon"
+is changed.  Notice, however, that once a "Polygon" is on a "MultiPolygon",
+the user has no access to it, so it can't be changed.  The only possibility
+is that the person writing "MultiPolygon" member functions inadvertently
+changes a "Polygon".
+
+3. See the BUG note in SliceView.cc.

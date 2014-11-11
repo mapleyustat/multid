@@ -1,0 +1,199 @@
+#ifndef _<T>LList_h
+#define _<T>LList_h
+
+#include <<T>.h>
+#include "Pix.h"
+
+// NOTE:  This list class is adapted from the one described by
+// Lippman in his second edition of the C++Primer.  The handling
+// of references is adapted from LList.{h,cc}P in the GNU C++ library.
+
+// The function
+//
+// 	int operator==(const <T> &, const <T> &)
+//
+// must be implemented for the class <T>.
+
+// If the elements of type <T> on the list are never to be changed,
+// then the <T> member of <T>LListNode should be made const,
+// as should the <T> & arguments to the following functions:
+// <T>LListNode::<T>LListNode() (both kinds); <T>LList::<T>LList();
+// and <T>LList::append and <T>LList::prepend with <T> & arguments.
+
+class <T>LListNode
+{
+private:
+	<T>LListNode(<T> & obj_);
+	<T>LListNode(<T> & obj_, <T>LListNode * next_);
+
+	static void reference(<T>LListNode * node);
+	static void dereference(<T>LListNode * node);
+
+	<T> &obj;
+	<T>LListNode *next;
+	short ref;
+
+	friend class <T>LList;
+};
+
+inline
+<T>LListNode::<T>LListNode(<T> & obj_)
+	: obj(obj_),
+	  ref(1)
+{
+}
+
+inline
+<T>LListNode::<T>LListNode(<T> & obj_,
+	<T>LListNode * next_)
+	: obj(obj_),
+	  next(next_),
+	  ref(1)
+{
+}
+
+inline void
+<T>LListNode::reference(<T>LListNode * node)
+{
+	if (node != 0)
+		++node->ref;
+}
+
+inline void
+<T>LListNode::dereference(<T>LListNode * node)
+{
+	while (node != 0 && --node->ref == 0) {
+		<T>LListNode *n = node->next;
+		delete node;
+		node = n;
+	}
+}
+
+class <T>LList
+{
+public:
+	<T>LList(void);
+	<T>LList(<T> & obj);
+	<T>LList(const <T>LList & list);
+	~<T>LList(void);
+	<T>LList & operator = (const <T>LList & list);
+
+	int null(void) const;
+
+	void empty(void);
+	void append(<T> & obj);
+	void append(const <T>LList & list);
+	void prepend(<T> & obj);
+	void prepend(const <T>LList & list);
+	void del(const <T> & obj);
+
+	Pix first(void) const;
+	void next(Pix & p) const;
+	const <T> & operator() (Pix p) const;
+	<T> & operator() (Pix p);
+
+private:
+	<T>LListNode *head;
+	<T>LListNode *tail;
+};
+
+inline
+<T>LList::<T>LList(void)
+	: head(0),
+	  tail(0)
+{
+}
+
+inline
+<T>LList::<T>LList(<T> & obj)
+	: head(new <T>LListNode(obj, 0)),
+	  tail(head)
+{
+}
+
+inline
+<T>LList::<T>LList(const <T>LList & list)
+	: head(list.head),
+	  tail(list.tail)
+{
+	<T>LListNode::reference(list.head);
+}
+
+inline
+<T>LList::~<T>LList(void)
+{
+	<T>LListNode::dereference(head);
+}
+
+inline <T>LList &
+<T>LList::operator = (const <T>LList & list)
+{
+	if (this != &list) {
+		<T>LListNode::dereference(head);
+		<T>LListNode::reference(list.head);
+		head = list.head;
+		tail = list.tail;
+	}
+	return *this;
+}
+
+inline int
+<T>LList::null(void) const
+{
+	return head == 0;
+}
+
+inline void
+<T>LList::empty(void)
+{
+	<T>LListNode::dereference(head);
+	head = 0;
+	tail = 0;
+}
+
+inline void
+<T>LList::append(<T> & obj)
+{
+	<T>LListNode *node = new <T>LListNode(obj, 0);
+	if (head == 0)
+		head = node;
+	else
+		tail->next = node;
+	tail = node;
+}
+
+inline void
+<T>LList::prepend(<T> & obj)
+{
+	<T>LListNode *node = head;
+	head = new <T>LListNode(obj, node);
+	if (node == 0)
+		tail = head;
+}
+
+inline Pix
+<T>LList::first(void) const
+{
+	return Pix(head);
+}
+
+inline void
+<T>LList::next(Pix & p) const
+{
+	if (p != 0)
+		p = Pix(((<T>LListNode *) p)->next);
+}
+
+inline const <T> &
+<T>LList::operator() (Pix p) const
+{
+	return ((<T>LListNode *) p)->obj;
+}
+
+inline <T> &
+<T>LList::operator() (Pix p)
+{
+	return ((<T>LListNode *) p)->obj;
+}
+
+#endif

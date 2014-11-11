@@ -1,0 +1,6 @@
+1. Calculate the bounding box size from the input out.
+
+2. Double buffering.
+
+NOTE:  Just add a call to double_buffer() at the end of show_frame(),
+as in SliderView.

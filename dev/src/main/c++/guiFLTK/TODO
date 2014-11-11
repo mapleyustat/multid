@@ -1,0 +1,15 @@
+1. Create Menu hierarchy.
+
+2. Statically initialize GUI. (?)
+
+3. Create PanelWindowButton, which is similar to PanelButton, except
+that it takes a Frame as an argument to the constructor, adds "..."
+to labels, and has a callback routine that does show() on the Frame.
+This requires the reference counter on Frames be implemented.
+
+(Maybe not.)
+
+4. Create PanelMenuButton, which is similar to PanelButton, except
+that it takes a Menu as an argument to the constructor.
+
+(Maybe not.)

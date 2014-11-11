@@ -1,0 +1,944 @@
+// Control macros:
+//
+//	VectorNArray_NO_CHECKING	-- turn off range checking
+
+// The semantics of the copy constructor, of the assignment operator,
+// and of the copy() and ref() member functions are as follows:
+//
+//	VectorNArray(const VectorNArray &vector_array):
+//		a. If shallow_copy() has been called by vector_array,
+//		   make "*this" a clone of (i.e., reference to) "vector_array".
+//		b. Otherwise copy the components of "vector_array" into "*this".
+//
+//	VectorNArray &operator=(const VectorNArray &):
+//		Detach "*this" from its clones
+//		and copy the components of "vector_array" into it.
+//
+//	VectorNArray &copy(const VectorNArray &):
+//		Copy the components of "vector_array" into "*this"
+//		(without detaching "*this" from its clones).
+//		The sizes of "*this" and "vector_array" must match.
+//
+//	VectorNArray &ref(VectorNArray &):
+//		Detach "*this" from its clones
+//		and make it a clone of "vector_array".
+//
+// When the return value of a function has type "VectorNArray" (as opposed
+// to "VectorNArray &", it is prudent to return a VectorNArray that has called
+// shallow_copy().  This way, the copy constructors called while
+// returning by value make clones rather than copy components.
+//
+// The semantics for MatrixNArrray are analogous.
+
+class VectorNArray
+{
+public:
+	VectorNArray(void);
+	VectorNArray(int size__);
+	VectorNArray(const VectorNArray &vector_array);
+	~VectorNArray(void);
+	VectorNArray &operator=(const VectorNArray &vector_array);
+	VectorNArray &copy(const VectorNArray &vector_array);
+	VectorNArray &ref(VectorNArray &vector_array);
+	void resize(int size__);
+	VectorNArray &zero(void);
+
+	static int n_comps(void);
+
+	int size(void) const;
+	VectorNArray &shallow_copy(void);
+
+	VectorN &operator()(int index);
+	const VectorN &operator()(int index) const;
+	double &operator()(int index, int comp);
+	double operator()(int index, int comp) const;
+
+	VectorNArray &operator*=(double s);
+	VectorNArray &operator*=(const ScalarArray &s);
+	VectorNArray &operator+=(const VectorNArray &b);
+	VectorNArray &operator-=(const VectorNArray &b);
+
+	class SizeMismatch : public std::exception { };
+
+private:
+	int size_;
+	Vector comps;
+
+	VectorNArray(const Vector &vector);
+};
+
+inline VectorNArray operator*(double s, const VectorNArray &a);
+inline VectorNArray operator*(const ScalarArray &s, const VectorNArray &a);
+inline VectorNArray operator+(const VectorNArray &a, const VectorNArray &b);
+inline VectorNArray operator-(const VectorNArray &a, const VectorNArray &b);
+
+std::istream &operator>>(std::istream &is, VectorNArray &vector_array);
+std::ostream &operator<<(std::ostream &os, const VectorNArray &vector_array);
+
+inline int
+VectorNArray::n_comps(void)
+{
+	return VectorN::n_comps();
+}
+
+inline int
+VectorNArray::size(void) const
+{
+	return size_;
+}
+
+inline VectorNArray &
+VectorNArray::shallow_copy(void)
+{
+	comps.shallow_copy();
+	return *this;
+}
+
+inline
+VectorNArray::VectorNArray(void)
+	: size_(0),
+	  comps()
+{
+}
+
+inline
+VectorNArray::VectorNArray(int size__)
+	: size_(size__),
+	  comps(n_comps()*size__)
+{
+}
+
+inline
+VectorNArray::VectorNArray(const VectorNArray &vector_array)
+	: size_(vector_array.size()),
+	  comps(vector_array.comps)
+{
+}
+
+inline
+VectorNArray::VectorNArray(const Vector &vector)
+	: size_(vector.size()/n_comps()),
+	  comps(vector)
+{
+}
+
+inline VectorNArray &
+VectorNArray::operator=(const VectorNArray &vector_array)
+{
+	size_ = vector_array.size();
+	comps = vector_array.comps;
+	return *this;
+}
+
+inline VectorNArray &
+VectorNArray::copy(const VectorNArray &vector_array)
+{
+	size_ = vector_array.size();
+	comps.copy(vector_array.comps);
+	return *this;
+}
+
+inline VectorNArray &
+VectorNArray::ref(VectorNArray &vector_array)
+{
+	size_ = vector_array.size();
+	comps.ref(vector_array.comps);
+	return *this;
+}
+
+inline void
+VectorNArray::resize(int size__)
+{
+	size_ = size__;
+	comps.resize(n_comps()*size__);
+}
+
+inline VectorNArray &
+VectorNArray::zero(void)
+{
+	comps.zero();
+	return *this;
+}
+
+inline VectorN &
+VectorNArray::operator()(int index)
+{
+	double *p = &comps.component(n_comps()*index);
+	return *reinterpret_cast<VectorN *>(p);
+}
+
+inline const VectorN &
+VectorNArray::operator()(int index) const
+{
+	double *p = &(const_cast<VectorNArray *>(this)
+		->comps.component(n_comps()*index));
+	return *reinterpret_cast<VectorN *>(p);
+}
+
+inline double &
+VectorNArray::operator()(int index, int comp)
+{
+	return (*this)(index)(comp);
+}
+
+inline double
+VectorNArray::operator()(int index, int comp) const
+{
+	return (*this)(index)(comp);
+}
+
+inline VectorNArray &
+VectorNArray::operator*=(double s)
+{
+	comps *= s;
+	return *this;
+}
+
+inline VectorNArray &
+VectorNArray::operator+=(const VectorNArray &b)
+{
+	comps += b.comps;
+	return *this;
+}
+
+inline VectorNArray &
+VectorNArray::operator-=(const VectorNArray &b)
+{
+	comps -= b.comps;
+	return *this;
+}
+
+inline VectorNArray
+operator*(double s, const VectorNArray &a)
+{
+	VectorNArray vector_array(a);
+	vector_array *= s;
+	return vector_array.shallow_copy();
+}
+
+inline VectorNArray
+operator*(const ScalarArray &s, const VectorNArray &a)
+{
+	VectorNArray vector_array(a);
+	vector_array *= s;
+	return vector_array.shallow_copy();
+}
+
+inline VectorNArray
+operator+(const VectorNArray &a, const VectorNArray &b)
+{
+	VectorNArray vector_array(a);
+	vector_array += b;
+	return vector_array.shallow_copy();
+}
+
+inline VectorNArray
+operator-(const VectorNArray &a, const VectorNArray &b)
+{
+	VectorNArray vector_array(a);
+	vector_array -= b;
+	return vector_array.shallow_copy();
+}
+
+class MatrixNArray
+{
+public:
+	MatrixNArray(void);
+	MatrixNArray(int size__);
+	MatrixNArray(const MatrixNArray &matrix_array);
+	virtual ~MatrixNArray(void);
+	MatrixNArray &operator=(const MatrixNArray &matrix_array);
+	MatrixNArray &copy(const MatrixNArray &matrix_array);
+	MatrixNArray &ref(MatrixNArray &matrix_array);
+	MatrixNArray &zero(void);
+
+	static int n_comps(void);
+
+	int size(void) const;
+	MatrixNArray &shallow_copy(void);
+
+	MatrixN &operator()(int index);
+	const MatrixN &operator()(int index) const;
+	double &operator()(int index, int row, int col);
+	double operator()(int index, int row, int col) const;
+
+	MatrixNArray &operator*=(double s);
+	MatrixNArray &operator*=(const ScalarArray &s);
+	MatrixNArray &operator+=(const MatrixNArray &b);
+	MatrixNArray &operator-=(const MatrixNArray &b);
+
+	MatrixNArray &equals_multiple_of_identity(double s);
+	MatrixNArray &add_multiple_of_identity(double s);
+
+	class SizeMismatch : public std::exception { };
+
+private:
+	int size_;
+	Vector comps;
+
+	static int matrix_size(void);
+
+	MatrixNArray(const Vector &vector);
+};
+
+inline MatrixNArray operator*(double s, const MatrixNArray &a);
+inline MatrixNArray operator*(const ScalarArray &s, const MatrixNArray &a);
+inline MatrixNArray operator+(const MatrixNArray &a, const MatrixNArray &b);
+inline MatrixNArray operator-(const MatrixNArray &a, const MatrixNArray &b);
+
+std::ostream &operator<<(std::ostream &os, const MatrixNArray &matrix_array);
+
+inline int
+MatrixNArray::n_comps(void)
+{
+	return VectorN::n_comps();
+}
+
+inline int
+MatrixNArray::matrix_size(void)
+{
+	return n_comps()*n_comps();
+}
+
+inline int
+MatrixNArray::size(void) const
+{
+	return size_;
+}
+
+inline MatrixNArray &
+MatrixNArray::shallow_copy(void)
+{
+	comps.shallow_copy();
+	return *this;
+}
+
+inline
+MatrixNArray::MatrixNArray(void)
+	: size_(0),
+	  comps()
+{
+}
+
+inline
+MatrixNArray::MatrixNArray(int size__)
+	: size_(size__),
+	  comps(matrix_size()*size__)
+{
+}
+
+inline
+MatrixNArray::MatrixNArray(const MatrixNArray &matrix_array)
+	: size_(matrix_array.size()),
+	  comps(matrix_array.comps)
+{
+}
+
+inline
+MatrixNArray::MatrixNArray(const Vector &vector)
+	: size_(vector.size()/matrix_size()),
+	  comps(vector)
+{
+}
+
+inline MatrixNArray &
+MatrixNArray::operator=(const MatrixNArray &matrix_array)
+{
+	size_ = matrix_array.size();
+	comps = matrix_array.comps;
+	return *this;
+}
+
+inline MatrixNArray &
+MatrixNArray::zero(void)
+{
+	comps.zero();
+	return *this;
+}
+
+inline MatrixNArray &
+MatrixNArray::copy(const MatrixNArray &matrix_array)
+{
+	size_ = matrix_array.size();
+	comps.copy(matrix_array.comps);
+	return *this;
+}
+
+inline MatrixNArray &
+MatrixNArray::ref(MatrixNArray &matrix_array)
+{
+	size_ = matrix_array.size();
+	comps.ref(matrix_array.comps);
+	return *this;
+}
+
+inline MatrixN &
+MatrixNArray::operator()(int index)
+{
+	double *p = &comps.component(matrix_size()*index);
+	return *reinterpret_cast<MatrixN *>(p);
+}
+
+inline const MatrixN &
+MatrixNArray::operator()(int index) const
+{
+	double *p = &(const_cast<MatrixNArray *>(this)
+		->comps.component(matrix_size()*index));
+	return *reinterpret_cast<MatrixN *>(p);
+}
+
+inline double &
+MatrixNArray::operator()(int index, int row, int col)
+{
+	return (*this)(index)(row, col);
+}
+
+inline double
+MatrixNArray::operator()(int index, int row, int col) const
+{
+	return (*this)(index)(row, col);
+}
+
+inline MatrixNArray &
+MatrixNArray::operator*=(double s)
+{
+	comps *= s;
+	return *this;
+}
+
+inline MatrixNArray &
+MatrixNArray::operator+=(const MatrixNArray &b)
+{
+	comps += b.comps;
+	return *this;
+}
+
+inline MatrixNArray &
+MatrixNArray::operator-=(const MatrixNArray &b)
+{
+	comps -= b.comps;
+	return *this;
+}
+
+inline MatrixNArray
+operator*(double s, const MatrixNArray &a)
+{
+	MatrixNArray matrix_array(a);
+	matrix_array *= s;
+	return matrix_array.shallow_copy();
+}
+
+inline MatrixNArray
+operator*(const ScalarArray &s, const MatrixNArray &a)
+{
+	MatrixNArray matrix_array(a);
+	matrix_array *= s;
+	return matrix_array.shallow_copy();
+}
+
+inline MatrixNArray
+operator+(const MatrixNArray &a, const MatrixNArray &b)
+{
+	MatrixNArray matrix_array(a);
+	matrix_array += b;
+	return matrix_array.shallow_copy();
+}
+
+inline MatrixNArray
+operator-(const MatrixNArray &a, const MatrixNArray &b)
+{
+	MatrixNArray matrix_array(a);
+	matrix_array -= b;
+	return matrix_array.shallow_copy();
+}
+
+
+//---D, by Citeli
+class MatrixNDerivative : private MatrixNArray
+{
+public:
+	MatrixNDerivative(void);
+	MatrixNDerivative(int size__);
+	MatrixNDerivative(const MatrixNDerivative &matrix_array);
+
+	//Esta relacionada com dBdU
+	//Ainda esta por implementar...
+	MatrixNDerivative(const MatrixN &matrix,const VectorN &vector);
+
+	~MatrixNDerivative(void);
+	MatrixNDerivative &operator=(const MatrixNDerivative &matrix_array);
+	MatrixNDerivative &copy(const MatrixNDerivative &matrix_array);
+	MatrixNDerivative &ref(MatrixNDerivative &matrix_array);
+	MatrixNDerivative &zero(void);
+
+	static int n_comps(void);
+
+	int size(void) const;
+	MatrixNDerivative &shallow_copy(void);
+
+	MatrixN &operator()(int index);
+	const MatrixN &operator()(int index) const;
+	double &operator()(int index, int row, int col);
+	double operator()(int index, int row, int col) const;
+
+	MatrixNDerivative &operator*=(double s);
+	MatrixNDerivative &operator*=(const ScalarArray &s);
+
+	MatrixNDerivative &operator+=(const MatrixNDerivative &b);
+	MatrixNDerivative &operator-=(const MatrixNDerivative &b);
+
+	friend class MatrixNDerivativeArray;
+};
+
+inline MatrixNDerivative operator*(double s, const MatrixNDerivative &a);
+inline MatrixNDerivative operator*(const ScalarArray &s,
+	const MatrixNDerivative &a);
+inline MatrixNDerivative operator+(const MatrixNDerivative &a,
+	const MatrixNDerivative &b);
+inline MatrixNDerivative operator-(const MatrixNDerivative &a,
+	const MatrixNDerivative &b);
+
+//Obs.: Esta e' a operacao "o" definida no paper
+//Esta implementada...
+inline MatrixN operator*(const VectorNArray &v,const MatrixNDerivative &m);
+inline MatrixN operator*(const MatrixNDerivative &m,const VectorNArray &v);
+
+std::ostream &operator<<(std::ostream &os,
+	const MatrixNDerivative &matrix_array);
+
+inline int
+MatrixNDerivative::n_comps(void)
+{
+	return MatrixNArray::n_comps();
+}
+
+inline int
+MatrixNDerivative::size(void) const
+{
+	return MatrixNArray::size();
+}
+
+inline MatrixNDerivative &
+MatrixNDerivative::shallow_copy(void)
+{
+	MatrixNArray::shallow_copy();
+	return *this;
+}
+
+inline
+MatrixNDerivative::MatrixNDerivative(void)
+	: MatrixNArray()
+{
+}
+
+inline
+MatrixNDerivative::MatrixNDerivative(int size__)
+	: MatrixNArray(size__)
+{
+}
+
+inline
+MatrixNDerivative::MatrixNDerivative(const MatrixNDerivative &matrix_array)
+	: MatrixNArray(matrix_array)
+{
+}
+
+inline
+MatrixNDerivative::~MatrixNDerivative(void)
+{
+}
+
+inline MatrixNDerivative &
+MatrixNDerivative::operator=(const MatrixNDerivative &matrix_array)
+{
+	MatrixNArray::operator=(matrix_array);
+	return *this;
+}
+
+inline MatrixNDerivative &
+MatrixNDerivative::zero(void)
+{
+	MatrixNArray::zero();
+	return *this;
+}
+
+inline MatrixNDerivative &
+MatrixNDerivative::copy(const MatrixNDerivative &matrix_array)
+{
+	MatrixNArray::copy(matrix_array);
+	return *this;
+}
+
+inline MatrixNDerivative &
+MatrixNDerivative::ref(MatrixNDerivative &matrix_array)
+{
+	MatrixNArray::ref(matrix_array);
+	return *this;
+}
+
+inline MatrixN &
+MatrixNDerivative::operator()(int index)
+{
+	return MatrixNArray::operator()(index);
+}
+
+inline const MatrixN &
+MatrixNDerivative::operator()(int index) const
+{
+	return MatrixNArray::operator()(index);
+}
+
+inline double &
+MatrixNDerivative::operator()(int index, int row, int col)
+{
+	return MatrixNArray::operator()(index,row,col);
+}
+
+inline double
+MatrixNDerivative::operator()(int index, int row, int col) const
+{
+	return MatrixNArray::operator()(index,row,col) ;
+}
+
+inline MatrixNDerivative &
+MatrixNDerivative::operator*=(double s)
+{
+	MatrixNArray::operator*=(s);
+	return *this;
+}
+
+inline MatrixNDerivative &
+MatrixNDerivative::operator+=(const MatrixNDerivative &b)
+{
+	MatrixNArray::operator+=(b);
+	return *this;
+}
+
+inline MatrixNDerivative &
+MatrixNDerivative::operator-=(const MatrixNDerivative &b)
+{
+	MatrixNArray::operator-=(b);
+	return *this;
+}
+
+inline MatrixNDerivative
+operator*(double s, const MatrixNDerivative &a)
+{
+	MatrixNDerivative matrix_array(a);
+	matrix_array *= s;
+	return matrix_array.shallow_copy();
+}
+
+inline MatrixNDerivative
+operator*(const ScalarArray &s, const MatrixNDerivative &a)
+{
+	MatrixNDerivative matrix_array(a);
+	matrix_array *= s;
+	return matrix_array.shallow_copy();
+}
+
+inline MatrixNDerivative
+operator+(const MatrixNDerivative &a, const MatrixNDerivative &b)
+{
+	MatrixNDerivative matrix_array(a);
+	matrix_array += b;
+	return matrix_array.shallow_copy();
+}
+
+inline MatrixNDerivative
+operator-(const MatrixNDerivative &a, const MatrixNDerivative &b)
+{
+	MatrixNDerivative matrix_array(a);
+	matrix_array -= b;
+	return matrix_array.shallow_copy();
+}
+
+//Obs.: Estas duas sao as operacoes definidas no paper
+
+inline MatrixN
+operator*(const VectorN &v,const MatrixNDerivative &ma)
+{
+	MatrixN m;
+	int p,q,j,n;
+
+	m.zero();
+	n = v.n_comps();
+	for(p=0;p<n;p++)
+		for(q=0;q<n;q++)
+			for(j=0;j<n;j++)
+			    m(p,q) = m(p,q) + ma(j,p,q)*v(j);
+	return m;
+}
+
+inline MatrixN
+operator*(const MatrixNDerivative &ma,const VectorN &v)
+{
+	MatrixN m;
+	int p,q,j,n;
+
+	m.zero();
+	n = v.n_comps();
+	for(p=0;p<n;p++)
+		for(q=0;q<n;q++)
+			for(j=0;j<n;j++)
+			    m(p,q) = m(p,q) + ma(j,p,q)*v(j);
+	return m;
+}
+
+//---DA, by Citeli
+class MatrixNDerivativeArray
+{
+public:
+	MatrixNDerivativeArray(void);
+	MatrixNDerivativeArray(int size__);
+	MatrixNDerivativeArray(const MatrixNDerivativeArray
+		&matrix_derivative_array);
+
+	~MatrixNDerivativeArray(void);
+
+	MatrixNDerivativeArray &operator=(const MatrixNDerivativeArray
+		&matrix_derivative_array);
+	MatrixNDerivativeArray &copy(const MatrixNDerivativeArray
+		&matrix_derivative_array);
+	MatrixNDerivativeArray &ref(MatrixNDerivativeArray
+		&matrix_derivative_array);
+	MatrixNDerivativeArray &zero(void);
+
+	static int n_comps(void);
+
+	int size(void) const;
+	MatrixNDerivativeArray & shallow_copy(void);
+
+	MatrixNDerivative &operator()(int n_cell);
+	const MatrixNDerivative &operator()(int n_cell) const;
+	MatrixN &operator()(int n_cell, int index);
+	const MatrixN &operator()(int n_cell, int index) const;
+	double &operator()(int n_cell, int index, int row, int col);
+	double operator()(int n_cell, int index, int row, int col) const;
+
+	MatrixNDerivativeArray &operator*=(const ScalarArray &s);
+	MatrixNDerivativeArray &operator*=(double s);
+	MatrixNDerivativeArray &operator+=(const MatrixNDerivativeArray &b);
+	MatrixNDerivativeArray &operator-=(const MatrixNDerivativeArray &b);
+
+	MatrixNDerivativeArray &equals_multiple_of_identity(double s);
+	MatrixNDerivativeArray &add_multiple_of_identity(double s);
+
+private:
+	int n_cells;
+	MatrixNDerivative *comps;
+
+	static int matrix_size(void);
+
+	// Not implemented, although it exists in MatrixNDerivative
+	MatrixNDerivativeArray(const Vector &vector);
+};
+
+inline MatrixNDerivativeArray operator+(const MatrixNDerivativeArray &a,
+	const MatrixNDerivativeArray &b);
+inline MatrixNDerivativeArray operator*(double s,
+	const MatrixNDerivativeArray &a);
+inline MatrixNDerivativeArray operator*(const ScalarArray &s,
+	const MatrixNDerivativeArray &a);
+inline MatrixNDerivativeArray operator-(const MatrixNDerivativeArray &a,
+	const MatrixNDerivativeArray &b);
+
+std::ostream &operator<<(std::ostream &os,
+	const MatrixNDerivativeArray &matrix_derivative_array);
+
+
+inline int
+MatrixNDerivativeArray::n_comps(void)
+{
+	return VectorN::n_comps();
+}
+
+inline int
+MatrixNDerivativeArray::matrix_size(void)
+{
+	return n_comps()*n_comps();
+}
+
+inline int
+MatrixNDerivativeArray::size(void) const
+{
+	return n_cells;
+}
+
+inline MatrixNDerivativeArray &
+MatrixNDerivativeArray::shallow_copy(void)
+{
+	for(int i=0;i<n_cells;i++) {
+		comps[i].shallow_copy();
+	}
+	return *this;
+}
+
+inline
+MatrixNDerivativeArray::MatrixNDerivativeArray(void)
+	: n_cells(0),
+	  comps(0)
+{
+}
+
+inline
+MatrixNDerivativeArray::MatrixNDerivativeArray(int size__)
+	: n_cells(size__),
+	  comps(new MatrixNDerivative[size__])
+{
+}
+
+inline
+MatrixNDerivativeArray::MatrixNDerivativeArray(const MatrixNDerivativeArray
+		&matrix_derivative_array)
+	: n_cells(matrix_derivative_array.size()),
+	  comps(matrix_derivative_array.comps)
+{
+}
+
+
+inline
+MatrixNDerivativeArray::~MatrixNDerivativeArray(void)
+{
+}
+
+inline MatrixNDerivativeArray &
+MatrixNDerivativeArray::operator=(const MatrixNDerivativeArray
+		&matrix_derivative_array)
+{
+	n_cells = matrix_derivative_array.size();
+	comps = matrix_derivative_array.comps;
+	return *this;
+}
+
+inline MatrixNDerivativeArray &
+MatrixNDerivativeArray::zero(void)
+{
+	for(int i=0;i<n_cells;i++)
+		comps[i].zero();
+	return *this;
+}
+
+inline MatrixNDerivative &
+MatrixNDerivativeArray::operator()(int n_cell)
+{
+	return comps[n_cell];
+}
+
+inline const MatrixNDerivative &
+MatrixNDerivativeArray::operator()(int n_cell) const
+{
+	return comps[n_cell];
+}
+
+inline MatrixN &
+MatrixNDerivativeArray::operator()(int n_cell, int index)
+{
+	return comps[n_cell](index);
+}
+
+inline const MatrixN &
+MatrixNDerivativeArray::operator()(int n_cell, int index) const
+{
+	return comps[n_cell](index);
+}
+
+
+inline double &
+MatrixNDerivativeArray::operator()(int n_cell,int index, int row, int col)
+{
+	return comps[n_cell](index,row,col);
+}
+
+inline double
+MatrixNDerivativeArray::operator()(int n_cell, int index, int row,
+		int col) const
+{
+	return comps[n_cell](index,row,col);
+}
+
+inline MatrixNDerivativeArray &
+MatrixNDerivativeArray::copy(const MatrixNDerivativeArray
+		&matrix_derivative_array)
+{
+	for(int i=0;i<n_cells;i++)
+		(*this)(i) = matrix_derivative_array(i) ;
+	return *this;
+}
+
+inline MatrixNDerivativeArray &
+MatrixNDerivativeArray::ref(MatrixNDerivativeArray &matrix_derivative_array)
+{
+	for(int i=0;i<n_cells;i++) {
+		(*this)(i).ref( matrix_derivative_array(i) );
+	}
+	return *this;
+}
+
+inline MatrixNDerivativeArray &
+MatrixNDerivativeArray::operator*=(double s)
+{
+	for(int i=0;i<n_cells;i++) {
+		comps[i] *= s;
+	}
+	return *this;
+}
+
+inline MatrixNDerivativeArray &
+MatrixNDerivativeArray::operator*=(const ScalarArray &s)
+{
+	for(int i=0;i<n_cells;i++) {
+		comps[i] *= s;
+	}
+	return *this;
+}
+
+inline MatrixNDerivativeArray &
+MatrixNDerivativeArray::operator+=(const MatrixNDerivativeArray &b)
+{
+	for(int i=0;i<n_cells;i++) {
+		comps[i] += b.comps[i];
+	}
+	return *this;
+}
+
+inline MatrixNDerivativeArray &
+MatrixNDerivativeArray::operator-=(const MatrixNDerivativeArray &b)
+{
+	for(int i=0;i<n_cells;i++) {
+		comps[i] -= b.comps[i];
+	}
+	return *this;
+}
+
+inline MatrixNDerivativeArray
+operator+(const MatrixNDerivativeArray &a, const MatrixNDerivativeArray &b)
+{
+	MatrixNDerivativeArray matrix_derivative_array(a);
+	matrix_derivative_array += b;
+	return matrix_derivative_array.shallow_copy();
+}
+
+inline MatrixNDerivativeArray
+operator*(double s, const MatrixNDerivativeArray &a)
+{
+	MatrixNDerivativeArray matrix_derivative_array(a);
+	matrix_derivative_array *= s;
+	return matrix_derivative_array.shallow_copy();
+}
+
+inline MatrixNDerivativeArray
+operator*(const ScalarArray &s, const MatrixNDerivativeArray &a)
+{
+	MatrixNDerivativeArray matrix_derivative_array(a);
+	matrix_derivative_array *= s;
+	return matrix_derivative_array.shallow_copy();
+}
+
+inline MatrixNDerivativeArray
+operator-(const MatrixNDerivativeArray &a, const MatrixNDerivativeArray &b)
+{
+	MatrixNDerivativeArray matrix_derivative_array(a);
+	matrix_derivative_array -= b;
+	return matrix_derivative_array.shallow_copy();
+}

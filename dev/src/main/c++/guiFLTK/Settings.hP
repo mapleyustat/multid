@@ -1,0 +1,62 @@
+#ifndef _<T>Settings_h
+#define _<T>Settings_h
+#ifdef __GNUC__
+#pragma interface
+#endif
+
+#include <ADTADV.h>
+#include <PanelWin.h>
+#include <PanelButton.h>
+// TODO:  Add include files for panel items.
+
+class <T>;
+
+class <T>Settings
+	: public ADV,
+	  public Settings
+{
+public:
+	<T>Settings(const Frame &parent, <T> &templ);
+
+	void update(void);
+
+	void apply(void);
+	void reset(void);
+
+private:
+	<T> &templ;
+
+	// TODO:  Add panel items; e.g.,
+	// PanelDoubleText param;
+};
+
+class <T>SettingsPanel
+	: public PanelWin
+{
+public:
+	<T>SettingsPanel(const Frame &parent, <T> &templ,
+		int x = GUI::default_x, int y = GUI::default_y);
+
+	void show(void);
+
+private:
+	<T>Settings templ_settings;
+	ApplyButton apply_button;
+	ResetButton reset_button;
+};
+
+class <T>SettingsButton
+	: public PanelButton
+{
+public:
+	<T>SettingsButton(const Panel &parent_, <T> &templ_);
+	~<T>SettingsButton(void);
+
+private:
+	<T> &templ;
+	<T>SettingsPanel *templ_settings_panel;
+
+	void proc(void);
+};
+
+#endif

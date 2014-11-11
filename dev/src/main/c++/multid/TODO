@@ -1,0 +1,36 @@
+URGENT:
+
+Remove Color member from most of GeomObj subclasses, as it is not used.
+(It has been replaced by Attributes.)  However, the coloring scheme for
+Multipolygons (and perhaps MultiPolylines) has to be rethought.  (For the
+moment, the Color member of a polygon is used if, and only if, it is
+displayed as part of a MultiPolygon.)
+
+1.  Should a MultiPolyline have a single color, or should it use the colors
+of the Polylines?
+
+2.  Create a ColoredGeomObj class, from which most GeomObjs are derived.
+
+3.  Create SourceScene and TargetScene classes.  A SourceScene contains
+a list of Map/TargetScene pairs; when it is changed, it also updates each
+TargetScene.  A TargetScene has a SourceScene reference; this can be used
+for picking.
+
+4.  Create ADVs associated with a Scene.  For example, create a SceneReader
+class (which has a PanelWin and a PanelText) and SceneView (which has a
+View2d or View3d and a PanelSlider).  Use these to clean up "display".
+
+NOTE:  SliderView is a start on this, but it need cleaning up.
+
+5.  Put "attributes" into the GeomObj class hierarchy and use these
+attributes, with a virtual function, to set colors, line styles, etc.
+
+6.  A Map should have a "vectorized" form of apply(), since apply() is
+called many times.
+
+7.  Because a GeomObjList is a list of GeomObj objects, not references,
+the type information for (say) a Point is lost when it is put into a Scene.
+A GeomObjList should not be a list of GeomObj references because this would
+interfere with the reference-counting.  What can be done so that a low
+level routine (e.g., XSwPlusSoMapAttributes::apply() in StonePlotWindows.cc)
+can use a dynamic cast?

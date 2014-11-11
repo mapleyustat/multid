@@ -1,0 +1,210 @@
+GUI library:
+-----------
+
+The GUI library models provides an interface to a window system.
+The original implementation was widely dependent on XView specifics,
+most of which are emulated in the current one.
+
+The present implementation uses the FLTK toolkit.
+
+The public class hierarchy is as follows:
+
+	GUI
+	Frame
+		PanelWin
+		CanvasWin
+	Canvas
+	Button
+	Panel
+
+	PanelButton
+	PanelChoice
+	PanelDoubleText
+	PanelMessage
+	PanelIntText
+	PanelSlider
+	PanelText
+	PanelToggle
+
+The basic use of this package is either:
+
+(a) to create a subclass of PanelWin that contains various PanelItems
+implementing useful notifier procedures; or
+
+(b) to create a subclass of CanvasWin that (1) contains various PanelItems
+implementing useful notifier procedures, (2) implements various EventHandler
+callback procedures, and (3) utilizes the Canvas.
+
+GUI:
+---
+
+A (single) GUI object must be created to initialize the GUI package,
+using a declaration such as "GUI gui(argc, argv)", where "argc" and
+"argv" are the arguments to "main()".  After this, the call
+"gui.start_loop()" initiates the event loop.  A subsequent call to
+"gui.stop_loop()" causes "gui.start_loop()" to return.  The GUI package
+is terminated when the GUI object "gui" is deleted (for instance, when
+it goes out of scope).
+
+The GUI maintains default values for the dimension and position of
+windows in the variables "default_height", "default_width", "default_x",
+and "default_y".  These are initialized to the values of the X resources
+classes "GUI.Height", "GUI.Width", "GUI.X", and "GUI.Y" (which are set,
+for instance, in the ".Xdefaults" file).
+
+Frame:
+-----
+
+    Base class for CanvasWin, PanelWin, and TextWin.
+
+Canvas:
+------
+
+    This provide mouse event-handling and OpenGL support.
+
+Button:
+------
+A Button is a long integer that codifies a mouse button event.  A
+Button contains the following information:  the TYPE (one or more of
+SELECT, ADJUST, and MENU); the ACTION (one of PRESS, RELEASE, or DRAG);
+and the MODIFIER (either NO_MODIFIER or one or more of SHIFT, CTRL, and
+META).  This information is accessed in the standard fashion using
+masks.  For example, if "(button & BUTTON_TYPE_MASK == BUTTON_SELECT)
+&& (button & BUTTON_CTRL)" is true, then "button" represents the SELECT
+mouse button (only) and the CTRL key (and possibly other modifier keys).
+
+EventHandler:
+------------
+
+OBS: EventHandler was originally a separate class from Canvas. Since they
+are not to be used separately, this class's interface was put into
+CanvasWin.
+
+An EventHandler is a Win that responds to events.  It contains several
+notifier procedures that are called when the appropriate event occurs
+in the graphics window:
+
+void pre_repaint(void),
+void repaint_proc(void):
+
+	These procedures are called when the graphics window must be
+	repainted.  (The procedure "pre_repaint()", which is called first,
+	is used to implement some derived classes of EventHandler.)
+
+void pre_resize(void),
+void resize_proc(void):
+
+	This procedure is called when the graphics window has been resized.
+	(The procedure "pre_resize()", which is called first, is used to
+	implement some derived classes of EventHandler.)
+
+void button_event_proc(Button button, int x, int y):
+
+	This procedure is called when a mouse button is pressed or released,
+	with "button" set to reflect the specific combination of mouse
+	buttons pressed or released.
+
+void drag_event_proc(Button button, int x, int y):
+
+	This procedure is called when a mouse button that is down is dragged,
+	with "button" set to reflect the specific combination of mouse
+	buttons that are down.
+
+void keyboard_event_proc(int key, int x, int y):
+
+	This procedure is called when a key is pressed, with "key" being
+	its ASCII code.
+
+void topkey_event_proc(int key, int x, int y),
+void leftkey_event_proc(int key, int x, int y),
+void rightkey_event_proc(int key, int x, int y):
+
+	These procedures are called when a function key is pressed, with
+	"key" being the number of the function key (for example, 5 for F5).
+
+In all cases, the variables "x" and "y" are the coordinates of the mouse
+when the event occurs.  These coordinates are measured in pixels relative
+to the upper left corner of the window.
+
+An EventHandler cannot be created per se, since the notifier procedures
+are pure virtual members.  Specific kinds of EventHandlers are
+subclassed from EventHandler, and the corresponding members implement
+its reponses to events.
+
+Panel:
+-----
+
+    Manages the geometry of PanelItems.
+
+PanelItem:
+---------
+
+    Was the base class for all PanelItems in the original implementation.
+    Removed.
+
+PanelButton:
+-----------
+
+    A button, with a proc() method called when it's clicked.
+
+PanelChoice:
+-----------
+
+    A pulldown selection list, with a proc(int) method called when the
+    selection changes.
+
+PanelDoubleText:
+------------
+
+    A text field that accepts only real numbers, and has a proc(double)
+    method that is called when the user presses enter.
+
+PanelMessage:
+------------
+
+    A text message.
+
+PanelIntText:
+------------
+
+    A text field that accepts only integer numbers, and has a proc(int)
+    method that is called when the user presses enter.
+
+PanelSlider:
+-----------
+
+    A slider (scrollbar) that registers an integer value. It's proc(int)
+    callback is called either when the user releases the slider or while
+    it is dragged (the choice must be specified in the constructor).
+
+PanelText:
+---------
+
+    A text field. Has a proc(char*) method that is called when the user
+    presses enter.
+
+PanelToggle:
+-----------
+
+    A group of check boxes or otherwise independent on/off items.
+    Has a proc(int) method that is called when any of the items changes
+    it's state. The int parameter of proc(int) is a bit mask containing
+    the values of each check box. This interface method is inherited
+    from the XView design.
+
+PanelWin:
+--------
+
+A PanelWin is a Frame with a Panel.
+
+CanvasWin:
+---------
+
+A CanvasWin is a Frame and an EventHandler with a Panel and a Canvas.
+As a Frame, a CanvasWin has a label, which is set using "display_label()",
+and it appears on the screen only after the routine "show()" has been
+called.  A CanvasWin can contain various PanelItems, which appear above
+the graphics canvas in a Panel with height set using the "panel_height"
+argument to the constructor.  The default panel height is zero, leaving no
+room to install PanelItems.  Note that all PanelItems must be installed
+before the first call to "show()".

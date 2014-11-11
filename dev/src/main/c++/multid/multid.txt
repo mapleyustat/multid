@@ -1,0 +1,203 @@
+multid library:
+--------------
+
+The multid library models multidimensional geometric objects.  The
+public class hierarchy is as follows:
+
+	Space
+	Map
+	GeomObj
+		Bond
+		BoundingBox
+		MultiPoint
+		MultiPolygon
+		MultiPolyline
+		Point
+		Polygon
+		Polyline
+		TODO: QuadMesh, TriangleStrip, Sroke
+	Scene
+		View2d
+		View3d
+
+The basic use of this package is to create Spaces, Maps between
+Spaces, and GeomObjs belonging to Spaces.  GeomObjs can be assembled
+into Scenes.  The GeomObjs and Scenes can then be displayed on the
+screen using the Prims class from the graphics library.  The classes
+View2d and View3d are convenient combinations of graphics windows
+and Scenes.
+
+Space:
+-----
+
+A Space represents a space in which geometric objects live.  As such,
+it has a dimension (dim) and a name; these attributes must be set at
+creation time.  A Space can be inserted into an ostream.
+
+Map:
+---
+A Map represents a generic map between two Spaces.  It has a domain and
+codomain; these attributes must be set at creation time.  A Map is used
+by a call such as "map.apply(in, out)", where "in" and "out" are the
+coordinates of points in the domain and codomain, respectively.
+
+A Map cannot be created per se, since "apply()" is a pure virtual
+member.  Specific kinds of Maps are subclassed from Map, and the
+corresponding "apply()" member implements its action.
+
+GeomObj:
+-------
+
+A GeomObj (geometrical object) represents a generic drawable object in
+a space.  The Space to which the GeomObj belongs must be set at
+creation time.  A GeomObj can be drawn by a Prims (from libgraphics)
+and printed in an ostream.  A GeomObj, per se, cannot be created, but
+can be copied from another GeomObj or obtained by applying a Map to
+another GeomObj; only concrete geometric objects (Point, etc.) can be
+created.
+
+GeomObjs behave like automatic variables, in that they are declared
+locally and copied.  Allocation and deallocation of the storage
+underlying a GeomObj is handled automatically.  In fact, a GeomObj may
+not be allocated from the free store.  For efficiency, however,
+GeomObjs are implemented so that copying of large amounts of storage
+(for example, for a MultiPolyline) does not take place unless
+necessary.
+
+Implementation notes:  A GeomObj is a smart pointer to an
+ActualGeomObj, which contains all underlying storage.  The
+ActualGeomObj has a counter that remembers the number of GeomObjs that
+point to the ActualGeomObj.  When a GeomObj is copied, only the pointer
+is copied, and the counter is incremented.  When a GeomObj is deleted,
+the counter is decremented, and if the counter reaches zero, the
+ActualGeomObj is deleted.  If, however, a GeomObj is one of several
+that point to a particular ActualGeomObj, and a change is to be made on
+its ActualGeomObj, then the ActualGeomObj is first copied onto a new
+ActualGeomObj.
+
+Besides containing storage for the geometrical object, an ActualGeomObj
+implements how a geometrical object is mapped, drawn, and printed.
+
+Bond:
+----
+
+A Bond is a GeomObj that represents a bond in a Space.  The Space to
+which the Bond belongs must be set at creation time.  A Bond has a
+Color, and the coordinates of its beginning and end points are accessed
+through calls such as "bond.beginning(i)" and "bond.end(i)", where "i"
+is an integer from 0 to dim - 1.  The function "length()" returns the
+length of the bond; "midpoint()" returns a Point corresponding to the
+midpoint of the bond, whereas "interpolant(fraction)" returns a Point
+corresponding to the point that is the prescribed fraction of the
+distance along the bond.  A Bond is drawn by a Prims as a line.
+
+BoundingBox:
+-----------
+
+A BoundingBox is a GeomObj that represents a bounding box in a Space,
+i.e., a hypercube defined by two points.  The Space to which the
+BoundingBox belongs must be set at creation time.  A BoundingBox has a
+Color, and the coordinates of its two corner points are accessed
+through calls such as "bounding_box.corner1(i)" and
+"bounding_box.corner2(i)", where "i" is an integer from 0 to dim - 1.
+A BoundingBox is drawn by a Prims with lines along its edges.
+
+MultiPoint:
+----------
+
+A MultiPoint is a GeomObj that represents an array of points in a
+Space.  The Space to which the MultiPoint belongs must be set at
+creation time.  A MultiPoint has a single Color.  The number of points
+it contains, which must also be set at creation time, is accessed using
+"n_points()".  The coordinates of the "k"th point are accessed through
+brackets, as in "multi_point[k][i]", where "i" is an integer from 0 to
+dim - 1.  A MultiPoint is drawn by a Prims as a multimarker.
+
+MultiPolygon:
+------------
+
+TODO:  fill this in.
+
+Implementation notes:  An ActualMultiPolygon contains a GeomObjList, which is
+implemented as a referenced linked list of GeomObjs, as adapted from
+Lippman and GNU.
+
+MultiPolyline:
+-------------
+
+TODO:  fill this in.
+
+Implementation notes:  An ActualMultiPolyline contains a GeomObjList, which is
+implemented as a referenced linked list of GeomObjs, as adapted from
+Lippman and GNU.
+
+Point:
+-----
+
+A Point is a GeomObj that represents a point in a Space.  The Space to
+which the Point belongs must be set at creation time.  A Point has a
+Color, and its coordinates are accessed through brackets, as in
+"point[i]", where "i" is an integer from 0 to dim - 1.  A Point is
+drawn by a Prims as a marker.
+
+Polygon:
+-------
+
+A Polygon is a GeomObj that represents a closed piecewise linear curve
+in a Space.  (By "closed" is meant that the last point is joined automatically
+to the first point.)  The Space to which the Polyline belongs must be set at
+creation time.  A Polyline has a single Color.  The number of points it
+contains, which must also be set at creation time, is accessed using
+"n_points()".  The coordinates of the "k"th point are accessed through
+brackets, as in "polygon[k][i]", where "i" is an integer from 0 to
+dim - 1.  A Polygon is drawn by a Prims as a polygon.
+
+Implementation note:  An ActualPolygon is a subclass of ActualMultiPoint.
+
+Polyline:
+--------
+
+A Polyline is a GeomObj that represents a piecewise linear curve in a
+Space.  The Space to which the Polyline belongs must be set at creation
+time.  A Polyline has a single Color.  The number of points it
+contains, which must also be set at creation time, is accessed using
+"n_points()".  The coordinates of the "k"th point are accessed through
+brackets, as in "polyline[k][i]", where "i" is an integer from 0 to
+dim - 1.  A Polyline is drawn by a Prims as a polyline.
+
+Implementation note:  An ActualPolyline is a subclass of ActualMultiPoint.
+
+Scene:
+-----
+
+A Scene is a collection of geometric objects in a Space.  The Space to
+which the Scene belongs must be set at creation time.  A Scene is
+initially empty, and can be emptied at later times by the function
+"empty()".  A Scene can be copied from another Scene; it can also be
+initialized with a single GeomObj.  Moreover, a GeomObj can be added or
+subtracted from a Scene.  All GeomObjs in a Scene are drawn by a Prims
+by a call such as "scene.draw(g_prims)"; a Scene can also be printed or
+inserted into an ostream.  A Scene that comprises the images of all of
+the GeomObjs in another Scene is created by a call such as "new_scene =
+new Scene(map, scene)".
+
+Implementation notes:  A Scene contains a GeomObjList, which is implemented
+as a referenced linked list of GeomObjs, as adapted from Lippman and GNU.
+
+View2d:
+------
+A View2d is a GWin2d (see the graphics library) and a Scene.  The Space to
+which the Scene belongs must be set at creation time and must be
+two-dimensional.  A View2d automatically draws the Scene when the window
+receives a repaint event.  Any Scene or GeomObj that is assigned or added
+to the View2d is automatically drawn.  Also, the bounds for the GWin2d
+are drawn as a BoundingBox (i.e., a square).
+
+View3d:
+------
+A View3d is a GWin3d (see the graphics library) and a Scene.  The Space to
+which the Scene belongs must be set at creation time and must be
+three-dimensional.  A View3d automatically draws the Scene when the window
+receives a repaint event.  Any Scene or GeomObj that is assigned or added
+to the View3d is automatically drawn.  Also, the bounds for the GWin3d
+are drawn as a BoundingBox (i.e., a cube).
