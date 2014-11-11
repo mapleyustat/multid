@@ -1,0 +1,49 @@
+Instructions
+
+0.  Arrange so that the environment variable WAVEDIR is set to
+the directory "wave" that contains the subdirectories "wutil",
+"guiFLTK", "graphGL", and "multid".
+
+1.  Compile wutil, guiFLTK, graphGL, multid, and multid/t by issuing the
+command "make" in each directory.
+
+2.  Run "t" in multid/t.  The features are as follows:
+
+a. Pressing the "Quit" button quits.
+
+b. Pressing the "Mobius" opens up the window for "Mobius" space, which
+has coordinates R (between -1 and 1) and phi between (-pi/2 and pi/2).
+Upon startup (if "OLD_TEST" is #defined, as it is by default), several
+objects are drawn in this space, and printouts of the space at various
+stages are given.  See old_test() in main.cc for details.
+
+c. Within the "Mobius" space, a left mouse click or drag draws horizontal
+lines.  Pressing the button draws a red bond, dragging draws yellow bonds,
+and releasing draws a cyan bond.  To erase what has been drawn, hit the
+"Undo" key (L4).  See the callback routines in Mobius.cc.
+
+d. Selecting the "Collapsed View" gives the projected image of what is
+in the Mobius space onto the space with coordinates u = R cos phi and
+v = R sin phi.  See the routines in MobiusControl.cc for details about
+the PanelChoice.
+
+e. Selecting the "Imbedded View" gives the imbedded image of what is
+in the Mobius space into the space with coordinates u = R cos phi,
+v = R sin phi, and phi.
+
+f. Within the Imbedding Space, a left mouse click or drag draws crosses
+(with z coordiate, in the virtual device space, equal to zero).  See the
+callback routines in Euclid3.cc.
+
+BUG:  This does not always work.  To get crosses, first zoom until the
+bounding box disappears; then use a left mouse click or drag.
+
+g. Within any 2d View, holding the control key and using the left, middle,
+or right mouse button causes the picture to be translated, scaled, or
+rotated, respectively.  The "Home" key (R7) resets the transformation.
+See graphics.doc for an explanation.
+
+h. Within any 3d View, holding the control key and using the left, middle,
+or right mouse button causes the picture to be translated, scaled, or
+rotated, respectively.  The "Home" key (R7) resets the transformation.
+See graphics.doc for an explanation.

@@ -1,0 +1,18 @@
+#!/bin/sh
+
+prog=tADTADV
+out=/tmp/"$prog$$.out"
+correct_out=/tmp/"$prog$$correct.out"
+
+cat > "$correct_out" << "END"
+adv1: i = 1
+adv2: i = 1
+adv1: i = 2
+adv2: i = 2
+END
+"$prog" > "$out"
+if diff "$correct_out" "$out" > /dev/null 2>&1; then
+	rm -f "$correct_out" "$out"
+	exit 0
+fi
+exit 1

@@ -1,0 +1,3 @@
+1.  If the mouse is dragged outside of the window and then lifted,
+the Mobius::button_event_proc() is never called, so that the MultiPolyline
+is never added to the Scene.

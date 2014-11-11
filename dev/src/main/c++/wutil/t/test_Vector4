@@ -1,0 +1,44 @@
+#!/bin/sh
+
+prog=tVector4
+out=/tmp/"$prog$$.out"
+correct_out=/tmp/"$prog$$correct.out"
+abserr=1.e-10
+
+cat > "$correct_out" << "END"
+Number of components: 4
+b: -1 3 4 1
+A:
+2 1 1 0 
+-2 0 -2 -1 
+2 3 1 -1 
+4 1 9 2 
+trace is:
+5
+deviator is:
+0.75 1 1 0 
+-2 -1.25 -2 -1 
+2 3 -0.25 -1 
+4 1 9 0.75 
+one norm is:
+13
+transpose is:
+2 -2 2 4 
+1 0 3 1 
+1 -2 1 9 
+0 -1 -1 2 
+F:
+-2 0 -2 -1 
+-1 3 -1 -2 
+-2 0.333333 5.33333 0.666667 
+-1 0.333333 -0.125 -0.25 
+1 2 3 3 
+x: -2 2 1 -1
+A*x: -1 3 4 1
+END
+"$prog" > "$out"
+if ndiff -abserr $abserr "$correct_out" "$out" > /dev/null 2>&1; then
+	rm -f "$correct_out" "$out"
+	exit 0
+fi
+exit 1

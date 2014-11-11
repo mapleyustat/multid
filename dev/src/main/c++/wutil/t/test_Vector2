@@ -1,0 +1,43 @@
+#!/bin/sh
+
+prog=tVector2
+out=/tmp/"$prog$$.out"
+correct_out=/tmp/"$prog$$correct.out"
+abserr=1.e-10
+
+cat > "$correct_out" << "END"
+b: 1 2
+A:
+1 1
+0 1
+trace is:
+2
+transpose is:
+1 0
+1 1
+deviator is:
+0 1
+0 0
+F:
+1 -1
+-0 1
+x: -1 2
+A*x: 1 2
+evals of A: 1 1
+evects of A:
+-1 -1
+0 0
+B:
+1.1 1
+0 1
+evals of B: 1 1.1
+evects of B:
+-0.995037 -1
+0.0995037 0
+END
+"$prog" > "$out"
+if ndiff -abserr $abserr "$correct_out" "$out" > /dev/null 2>&1; then
+	rm -f "$correct_out" "$out"
+	exit 0
+fi
+exit 1

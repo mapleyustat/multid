@@ -2,17 +2,6 @@
 
 lib_LTLIBRARIES = libguiFLTK.la
 
-libguiFLTK_la_CXXFLAGS =
-if DEBUG
-GCC_WARNING_CXXFLAGS_ = -std=c++98 -pedantic -Wall -Wextra -Weffc++ \
-	-Wctor-dtor-privacy -Wno-deprecated -Wstrict-null-sentinel \
-	-Wno-non-template-friend -Wno-pmf-conversions -Wsign-promo \
-	-Wshadow -Wpointer-arith -Wcast-qual -Wcast-align \
-	-Wwrite-strings -Wconversion -Wredundant-decls \
-	-Winline -Wno-invalid-offsetof -Wold-style-cast \
-	-Woverloaded-virtual -Wsynth
-libguiFLTK_la_CXXFLAGS += $(GCC_WARNING_CXXFLAGS_)
-endif
 libguiFLTK_la_SOURCES = \
 	Button.h \
 	Canvas.cc Canvas.h \
@@ -33,6 +22,18 @@ libguiFLTK_la_SOURCES = \
 	PanelWin.cc PanelWin.h \
 	Settings.cc Settings.h \
 	TextWin.cc TextWin.h
+
+AM_CXXFLAGS =
+if DEBUG
+GCC_WARNING_CXXFLAGS_ = -std=c++98 -pedantic -Wall -Wextra -Weffc++ \
+	-Wctor-dtor-privacy -Wno-deprecated -Wstrict-null-sentinel \
+	-Wno-non-template-friend -Wno-pmf-conversions -Wsign-promo \
+	-Wshadow -Wpointer-arith -Wcast-qual -Wcast-align \
+	-Wwrite-strings -Wconversion -Wredundant-decls \
+	-Winline -Wno-invalid-offsetof -Wold-style-cast \
+	-Woverloaded-virtual -Wsynth
+AM_CXXFLAGS += $(GCC_WARNING_CXXFLAGS_)
+endif
 
 EXTRA_DIST = \
 	gui.txt \
