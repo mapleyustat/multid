@@ -38,6 +38,7 @@ GCC_WARNING_CXXFLAGS_ = -std=c++98 -pedantic -Wall -Wextra -Weffc++ \
 AM_CXXFLAGS += $(GCC_WARNING_CXXFLAGS_)
 endif
 
-EXTRA_DIST =
+EXTRA_DIST = \
+	graph.txt
 
 SUBDIRS = . t_graphGL
