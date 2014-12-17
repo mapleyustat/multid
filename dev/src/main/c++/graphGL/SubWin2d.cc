@@ -156,7 +156,7 @@ SubWin2d::leftkey_event_proc(int key, double x, double y)
 void
 SubWin2d::rightkey_event_proc(int key, double x, double y)
 {
-    if (key == 7 /* HOME */)
+    if (key == 0xff50 /* HOME */)
     {
         trans_2d.identity_vdc();
         pre_repaint();

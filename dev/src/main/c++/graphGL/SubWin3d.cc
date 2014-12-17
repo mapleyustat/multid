@@ -168,7 +168,7 @@ SubWin3d::leftkey_event_proc(int key, double x, double y)
 void
 SubWin3d::rightkey_event_proc(int key, double x, double y)
 {
-    if (key == 7 /* HOME */) {
+    if (key == 0xff50 /* HOME */) {
         trans_3d.identity_vdc();
         pre_repaint();
         repaint_proc();

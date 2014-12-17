@@ -53,6 +53,8 @@ Canvas::draw(void)
 	parent_frame_.repaint_proc();
 }
 
+#include <iostream>
+
 int
 Canvas::handle(int event)
 {
@@ -70,24 +72,41 @@ Canvas::handle(int event)
 		Fl::event_x(), Fl::event_y());
 	    return 1;
 	case FL_SHORTCUT:
-	    switch (Fl::event_key()) {
-		case FL_Up:
-		    parent_frame_.topkey_event_proc(Fl::event_key()-FL_KP,
-			Fl::event_x(), Fl::event_y());
-		    return 1;
-		case FL_Right:
-		    parent_frame_.rightkey_event_proc(Fl::event_key()-FL_KP,
-			Fl::event_x(), Fl::event_y());
-		    return 1;
-		case FL_Left:
-		    parent_frame_.leftkey_event_proc(Fl::event_key()-FL_KP,
-			Fl::event_x(), Fl::event_y());
-		    return 1;
-		default:
-		    parent_frame_.topkey_event_proc(Fl::event_key()-FL_KP,
-			Fl::event_x(), Fl::event_y());
-		    return 1;
-	    }
+	    int key = Fl::event_key();
+            /*
+            if (key == 0)
+                std::cerr << "ASCI NUL" << "\n";
+            else if (key > 0 && key <= 255)
+                std::cerr << "ASCI " << key << "\n";
+            else if (key > FL_F && key <= FL_F_Last)
+                std::cerr << "FL_F + " << key - FL_F << "\n";
+            else if (key >= FL_KP && key <= FL_KP_Last)
+                std::cerr << "FL_KP + " << key - FL_KP << "\n";
+            else if (key >= FL_Button && key <= FL_Button+7)
+                std::cerr << "FL_Button + " << key - FL_Button << "\n";
+            else
+                std::cerr << "Extended " << key << "\n";
+            */
+            if (key >= 0 && key <= 255) {
+                parent_frame_.leftkey_event_proc(key, Fl::event_x(),
+                        Fl::event_y());
+                return 1;
+            }
+            else if (key >= FL_KP && key <= FL_KP_Last) {
+                parent_frame_.rightkey_event_proc(key, Fl::event_x(),
+                        Fl::event_y());
+                return 1;
+            }
+            else if (key > FL_F && key <= FL_F_Last) {
+                parent_frame_.topkey_event_proc(key, Fl::event_x(),
+                        Fl::event_y());
+                return 1;
+            }
+            else {
+                parent_frame_.rightkey_event_proc(key, Fl::event_x(),
+                        Fl::event_y());
+                return 1;
+            }
     }
     return 0;
 }

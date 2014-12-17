@@ -109,6 +109,8 @@ GWin2d::button_event_proc(Button button, int xmin_, int ymin_)
             double x_wc, y_wc;
             trans_2d.map_vdc_to_wc(x_vdc, y_vdc, x_wc, y_wc);
             button_proc(button, x_wc, y_wc);
+            if (button & BUTTON_RELEASE)
+                post_repaint();
         }
     }
 }
@@ -149,7 +151,7 @@ GWin2d::drag_event_proc(Button button, int xmin_, int ymin_)
     else {
         pre_repaint();
         repaint_proc();
-        if (double_buffering()) double_buffer();
+        post_repaint();
     }
 }
 
@@ -193,7 +195,7 @@ void
 GWin2d::rightkey_event_proc(int key, int xmin_, int ymin_)
 {
     if (raster.viewport().contains(xmin_, ymin_)) {
-        if (key == 7 /* HOME */) {
+        if (key == 0xff50 /* HOME */) {
             trans_2d.identity_vdc();
             pre_repaint();
             repaint_proc();

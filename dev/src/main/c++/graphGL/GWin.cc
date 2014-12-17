@@ -16,7 +16,8 @@ GWin::GWin(const Frame &parent__, int /* panel_height */,
 	  raster(canvas()),
 	  save_button(panel(), this)
 {
-	single_buffer();
+//	single_buffer();
+        double_buffer();
 	make_current();
 }
 
@@ -74,6 +75,9 @@ void
 GWin::show(void)
 {
 	CanvasWin::show();
+        pre_repaint();
+        repaint_proc();
+        post_repaint();
 }
 
 void

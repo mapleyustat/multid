@@ -202,7 +202,7 @@ void
 GWin3d::rightkey_event_proc(int key, int xmin_, int ymin_)
 {
     if (raster.viewport().contains(xmin_, ymin_)) {
-        if (key == 7 /* HOME */) {
+        if (key == 0xff50 /* HOME */) {
             trans_3d.identity_vdc();
             pre_repaint();
             repaint_proc();
