@@ -9,7 +9,7 @@
 void
 ActualPolyline::draw(Prims &prims) const
 {
-//	prims.line_color(color);
+	prims.line_color(color);
 	CoordsArray coords_array(space().dim(), n_points, coords);
 	prims.polyline(coords_array);
 }

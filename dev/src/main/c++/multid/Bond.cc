@@ -36,7 +36,7 @@ ActualBond::ActualBond(const ActualBond &actual_bond)
 void
 ActualBond::draw(Prims &prims) const
 {
-//	prims.line_color(color);
+	prims.line_color(color);
 	CoordsArray coords_array(space().dim(), 2, coords);
 	prims.polyline(coords_array);
 }

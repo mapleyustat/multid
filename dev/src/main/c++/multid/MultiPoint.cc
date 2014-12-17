@@ -41,7 +41,7 @@ ActualMultiPoint::ActualMultiPoint(const ActualMultiPoint &actual_multi_point)
 void
 ActualMultiPoint::draw(Prims &prims) const
 {
-//	prims.marker_color(color);
+	prims.marker_color(color);
 	CoordsArray coords_array(space().dim(), n_points, coords);
 	prims.multimarker(coords_array);
 }

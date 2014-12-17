@@ -50,7 +50,7 @@ ActualMultiPolygon::~ActualMultiPolygon(void)
 void
 ActualMultiPolygon::draw(Prims &prims) const
 {
-//	prims.edge_color(color);
+	prims.edge_color(color);
 	if (modified)
 		const_cast<ActualMultiPolygon *>(this)->update();
 	if (!list.null())

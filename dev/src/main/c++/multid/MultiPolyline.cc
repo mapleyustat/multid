@@ -47,7 +47,7 @@ ActualMultiPolyline::~ActualMultiPolyline(void)
 void
 ActualMultiPolyline::draw(Prims &prims) const
 {
-//	prims.line_color(color);
+	prims.line_color(color);
 	if (modified)
 		const_cast<ActualMultiPolyline *>(this)->update();
 	if (!list.null())

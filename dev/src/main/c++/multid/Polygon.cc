@@ -13,7 +13,7 @@ Polygon::~Polygon(void)
 void
 ActualPolygon::draw(Prims &prims) const
 {
-//	prims.edge_color(color);
+	prims.edge_color(color);
 	CoordsArray coords_array(space().dim(), n_points, coords);
 	prims.polygon(coords_array, color);
 }
