@@ -77,7 +77,7 @@ Color::Color(const double* rgb)
 }
 
 std::ostream &
-operator<<(std::ostream &os, const Color & /* color */)
+operator<<(std::ostream &os, const Color &color)
 {
 /*
     This can wait: outputting the "nearest pure" color name is not so simple
@@ -98,6 +98,7 @@ operator<<(std::ostream &os, const Color & /* color */)
     if (index != nearest_pure)
         os << (1. - (nearest_pure - index)/double(SEG_LENGTH - 1));
 */
+    os << "c " << color.R << " " << color.G << " " << color.B;
     return os;
 }
 
@@ -106,6 +107,15 @@ operator>>(std::istream &is, Color &color)
 {
     char c;
     is >> c;
+    if (c == 'c') {
+        double rgb[3];
+        is >> rgb[0] >> rgb[1] >> rgb[2];
+        if (is)
+            color = Color(rgb);
+        else
+            color = Color::FOREGROUND;
+        return is;
+    }
     if (c == 'F')
         is.ignore();
     else if (c == 'B') {
@@ -116,7 +126,7 @@ operator>>(std::istream &is, Color &color)
         }
     }
     switch (c) {
-    case 'R':   color = Color::RED;     break;
+    case 'R':   color = Color::RED;         break;
     case 'G':   color = Color::GREEN;       break;
     case 'B':   color = Color::BLUE;        break;
     case 'C':   color = Color::CYAN;        break;
