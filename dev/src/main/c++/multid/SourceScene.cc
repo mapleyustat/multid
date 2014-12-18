@@ -61,24 +61,24 @@ SourceScene::del_last(const GeomObj &geom_obj)
 }
 
 void
-SourceScene::single_buffer(void)
+SourceScene::double_buffering(int on_off)
 {
 	for (Pix p = list.first(); p != 0; list.next(p))
-		list(p).single_buffer();
+		list(p).double_buffering(on_off);
 }
 
 void
-SourceScene::double_buffer(void)
+SourceScene::swap_buffers(void)
 {
 	for (Pix p = list.first(); p != 0; list.next(p)) {
-		// ensure double_buffer() has not been called
+		// ensure swap_buffers() has not been called
 		// for this "Pix"'s GWin before
 		Pix q;
 		for (q = list.first(); &list(p).win() != &list(q).win();
 				list.next(q))
 			;
 		if (p == q)
-			list(p).double_buffer();
+			list(p).swap_buffers();
 	}
 }
 

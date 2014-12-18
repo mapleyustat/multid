@@ -103,20 +103,23 @@ GWin3d::button_event_proc(Button button, int xmin_, int ymin_)
                 previous_y = y_vdc;
                 previous_radius = max(hypot(x_vdc, y_vdc), ZERO_RADIUS);
                 previous_double_buffering = double_buffering();
-                if (!previous_double_buffering) double_buffer();
+                if (!previous_double_buffering)
+                    swap_buffers();
             }
             else if (button & BUTTON_RELEASE) {
                 pre_repaint();
                 repaint_proc();
-                double_buffer();
+                swap_buffers();
                 if (!previous_double_buffering)
-                    single_buffer();
+                    double_buffering(0);
             }
         }
         else {
             double x_wc, y_wc, z_wc;
             trans_3d.map_vdc_to_wc(x_vdc, y_vdc, x_wc, y_wc, z_wc);
             button_proc(button, x_wc, y_wc, z_wc);
+            if (button & BUTTON_RELEASE)
+                post_repaint();
         }
     }
 }
@@ -147,7 +150,7 @@ GWin3d::drag_event_proc(Button button, int xmin_, int ymin_)
             }
             pre_repaint();
             repaint_proc();
-            double_buffer();
+            post_repaint();
         }
         else {
             double x_wc, y_wc, z_wc;
@@ -158,7 +161,7 @@ GWin3d::drag_event_proc(Button button, int xmin_, int ymin_)
     else {
         pre_repaint();
         repaint_proc();
-        if (double_buffering()) double_buffer();
+        post_repaint();
     }
 }
 

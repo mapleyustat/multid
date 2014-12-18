@@ -95,14 +95,14 @@ GWin2d::button_event_proc(Button button, int xmin_, int ymin_)
                 previous_angle = atan2(y_vdc, x_vdc);
                 previous_double_buffering = double_buffering();
                 if (!previous_double_buffering)
-                    double_buffer();
+                    swap_buffers();
             }
             else if (button & BUTTON_RELEASE) {
                 pre_repaint();
                 repaint_proc();
-                double_buffer();
+                swap_buffers();
                 if (!previous_double_buffering)
-                    single_buffer();
+                    double_buffering(0);
             }
         }
         else {
@@ -140,7 +140,7 @@ GWin2d::drag_event_proc(Button button, int xmin_, int ymin_)
             }
             pre_repaint();
             repaint_proc();
-            double_buffer();
+            post_repaint();
         }
         else {
             double x_wc, y_wc;

@@ -15,8 +15,8 @@ public:
 			View2d &view_2d__);
 	~TargetView2d(void);
 
-	void single_buffer(void);
-	void double_buffer(void);
+	void double_buffering(int on_off);
+	void swap_buffers(void);
 
 	GWin &win();
 protected:
@@ -39,15 +39,15 @@ TargetView2d::view_2d(void)
 }
 
 inline void
-TargetView2d::single_buffer(void)
+TargetView2d::double_buffering(int on_off)
 {
-	view_2d().single_buffer();
+	view_2d().double_buffering(on_off);
 }
 
 inline void
-TargetView2d::double_buffer(void)
+TargetView2d::swap_buffers(void)
 {
-	view_2d().double_buffer();
+	view_2d().swap_buffers();
 }
 
 #endif

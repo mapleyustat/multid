@@ -76,6 +76,7 @@ View2d::empty(void)
 	prims().clear();
 	bbox.draw(prims());
 	Scene::empty();
+        swap_buffers();
 }
 
 void
@@ -84,6 +85,7 @@ View2d::join(const Scene &scene_)
 	scene_.draw(prims());
 	bbox.draw(prims());
 	Scene::join(scene_);
+        swap_buffers();
 }
 
 void
@@ -92,6 +94,7 @@ View2d::add(const GeomObj &geom_obj)
 	geom_obj.draw(prims());
 	bbox.draw(prims());
 	Scene::add(geom_obj);
+        swap_buffers();
 }
 
 void
@@ -115,6 +118,7 @@ View2d::repaint_proc(void)
 {
 	Scene::draw(prims());
 	bbox.draw(prims());
+        swap_buffers();
 }
 
 std::ostream &

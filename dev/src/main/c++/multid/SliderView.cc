@@ -86,5 +86,5 @@ SliderView::show_frame(int frame)
 {
 	empty();
 	add(scene[frame]);
-	double_buffer();
+	swap_buffers();
 }

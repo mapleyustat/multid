@@ -19,7 +19,7 @@ public:
 
 	void button_proc(Button button, double x, double y);
 	void drag_proc(Button button, double x, double y);
-	void leftkey_proc(int key, double x, double y);
+	void rightkey_proc(int key, double x, double y);
 
 private:
 	Mobius(const Mobius &);            // Do not define.

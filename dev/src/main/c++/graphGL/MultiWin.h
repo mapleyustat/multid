@@ -46,7 +46,7 @@ public:
     ~MultiWin(void);
 
 
-    void double_buffer(void);
+    void swap_buffers(void);
     void refresh(void);
 
     void save(const std::string filename);
@@ -93,9 +93,8 @@ private:
 };
 
 inline void
-MultiWin::double_buffer(void)
+MultiWin::swap_buffers(void)
 {
-    canvas_.make_current();
     canvas_.swap_buffers();
 }
 

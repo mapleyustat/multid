@@ -15,8 +15,8 @@ public:
 			View3d &view_3d__);
 	~TargetView3d(void);
 
-	void single_buffer(void);
-	void double_buffer(void);
+	void double_buffering(int on_off);
+	void swap_buffers(void);
 
 	GWin &win();
 protected:
@@ -39,15 +39,15 @@ TargetView3d::view_3d(void)
 }
 
 inline void
-TargetView3d::single_buffer(void)
+TargetView3d::double_buffering(int on_off)
 {
-	view_3d().single_buffer();
+	view_3d().double_buffering(on_off);
 }
 
 inline void
-TargetView3d::double_buffer(void)
+TargetView3d::swap_buffers(void)
 {
-	view_3d().double_buffer();
+	view_3d().swap_buffers();
 }
 
 #endif

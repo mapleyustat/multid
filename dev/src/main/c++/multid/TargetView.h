@@ -23,8 +23,8 @@ public:
 	void del(const GeomObj &geom_obj);
 	void del_last(const GeomObj &geom_obj);
 
-	virtual void single_buffer(void) = 0;
-	virtual void double_buffer(void) = 0;
+	virtual void double_buffering(int on_off) = 0;
+	virtual void swap_buffers(void) = 0;
 
 	virtual GWin &win() = 0;
 protected:

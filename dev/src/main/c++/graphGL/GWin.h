@@ -86,7 +86,6 @@ public:
 		int width = GUI::default_width);
 	~GWin(void);
 
-
 	virtual void save(const std::string filename);
 // Saves the contents to a PS file, may be called arbitrarily from user code.
 
@@ -99,8 +98,8 @@ public:
 
 	void make_current(void);
 	int double_buffering(void) const;
-	void single_buffer(void);
-	void double_buffer(void);
+	void double_buffering(int on_off);
+	void swap_buffers(void);
 
 protected:
 	int previous_double_buffering;

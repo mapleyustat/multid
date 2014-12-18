@@ -291,16 +291,16 @@ Mobius::drag_proc(Button button, double x, double y)
 #endif
 
 void
-Mobius::leftkey_proc(int key, double /* x */, double /* y */)
+Mobius::rightkey_proc(int key, double /* x */, double /* y */)
 {
-	if (key == 4 /* UNDO */) {
+	if (key == 0xff57 /* END */) {
 		empty();
 		if (euclid2 != 0)
 			euclid2->empty();
 		if (euclid3 != 0)
 			euclid3->empty();
 	}
-	else if (key == 6 /* COPY */) {
+	else if (key == 0xff56 /* PAGE_DOWN */) {
 		std::cerr << *this;
 		if (euclid2 != 0)
 			std::cerr << *euclid2;

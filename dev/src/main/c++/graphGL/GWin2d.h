@@ -40,7 +40,6 @@ public:
     virtual void rightkey_proc(int key, double x, double y);
 
 protected:
-
     void pre_repaint();
     void post_repaint();
     void pre_resize(void);

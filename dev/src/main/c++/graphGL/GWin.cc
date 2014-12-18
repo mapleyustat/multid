@@ -16,8 +16,7 @@ GWin::GWin(const Frame &parent__, int /* panel_height */,
 	  raster(canvas()),
 	  save_button(panel(), this)
 {
-//	single_buffer();
-        double_buffer();
+        double_buffering(1);
 	make_current();
 }
 
@@ -97,29 +96,21 @@ GWin::double_buffering(void) const
 }
 
 void
-GWin::single_buffer(void)
+GWin::double_buffering(int on_off)
 {
-	canvas_.double_buffering(0);
-	make_current();
+	canvas_.double_buffering(on_off);
 }
 
 void
-GWin::double_buffer(void)
+GWin::swap_buffers(void)
 {
-	make_current();
-	if (double_buffering())
-		canvas_.swap_buffers();
-	else {
-		canvas_.double_buffering(1);
-		canvas_.make_current();
-	}
+        canvas_.swap_buffers();
 }
 
 void
 GWin::post_repaint()
 {
-	if (double_buffering())
-		double_buffer();
+        swap_buffers();
 }
 
 void

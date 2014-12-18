@@ -23,8 +23,8 @@ public:
 
 	// The following are needed to allow a TargetView to communicate
 	// with the other TargetViews concerning single and double buffering.
-	void single_buffer(void);
-	void double_buffer(void);
+	void double_buffering(int on_off);
+	void swap_buffers(void);
 
 	void attach(TargetView &target_view);
 	void remove(const TargetView &target_view);
