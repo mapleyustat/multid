@@ -35,7 +35,9 @@ ActualPoint::ActualPoint(const ActualPoint &actual_point)
 void
 ActualPoint::draw(Prims &prims) const
 {
+#ifndef USE_ATTRIBUTES
 	prims.marker_color(color);
+#endif
 	CoordsArray coords_array(space().dim(), 1, coords);
 	prims.multimarker(coords_array);
 }

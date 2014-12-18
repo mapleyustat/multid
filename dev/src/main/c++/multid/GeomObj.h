@@ -107,7 +107,6 @@ inline
 GeomObj::GeomObj(const Map &map, const GeomObj &geom_obj)
 	: actual(geom_obj.actual->image(map))
 {
-//	const Attributes *a = map.image_attributes(geom_obj);
 	const Attributes *a = map.image_attributes(geom_obj);
 	actual->set_attributes(a);
 //	actual->set_attributes(map.image_attributes(geom_obj));

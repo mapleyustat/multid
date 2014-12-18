@@ -26,9 +26,17 @@ Euclid3::button_proc(Button button, double x__, double y__, double z__)
 		pt[1] = y__;
 		pt[2] = z__;
 		if (button & BUTTON_RELEASE)
+#ifdef USE_ATTRIBUTES
 			pt.set_attributes(ColorAttributes::GREEN);
+#else
+			pt.color() = Color::GREEN;
+#endif
 		else
+#ifdef USE_ATTRIBUTES
 			pt.set_attributes(ColorAttributes::BLUE);
+#else
+			pt.color() = Color::BLUE;
+#endif
 		add(pt);
 	}
 }
@@ -41,7 +49,11 @@ Euclid3::drag_proc(Button button, double x__, double y__, double z__)
 		pt[0] = x__;
 		pt[1] = y__;
 		pt[2] = z__;
+#ifdef USE_ATTRIBUTES
 		pt.set_attributes(ColorAttributes::MAGENTA);
+#else
+		pt.color() = Color::MAGENTA;
+#endif
 		add(pt);
 	}
 }

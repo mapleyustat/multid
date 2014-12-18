@@ -46,7 +46,9 @@ ActualBoundingBox::ActualBoundingBox(
 void
 ActualBoundingBox::draw(Prims &prims) const
 {
+#ifndef USE_ATTRIBUTES
 	prims.line_color(color);
+#endif
 	if (space().dim() == 2) {
 		double coords[10];
 

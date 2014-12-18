@@ -53,7 +53,9 @@ Canvas::draw(void)
 	parent_frame_.repaint_proc();
 }
 
+/* DEBUG
 #include <iostream>
+END DEBUG */
 
 int
 Canvas::handle(int event)
@@ -73,7 +75,7 @@ Canvas::handle(int event)
 	    return 1;
 	case FL_SHORTCUT:
 	    int key = Fl::event_key();
-            /*
+/* DEBUG
             if (key == 0)
                 std::cerr << "ASCI NUL" << "\n";
             else if (key > 0 && key <= 255)
@@ -86,7 +88,7 @@ Canvas::handle(int event)
                 std::cerr << "FL_Button + " << key - FL_Button << "\n";
             else
                 std::cerr << "Extended " << key << "\n";
-            */
+END DEBUG */
             if (key >= 0 && key <= 255) {
                 parent_frame_.leftkey_event_proc(key, Fl::event_x(),
                         Fl::event_y());

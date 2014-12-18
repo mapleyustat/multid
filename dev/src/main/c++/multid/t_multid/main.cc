@@ -99,7 +99,11 @@ old_test(Mobius &mobius)
 	point[0] = 0.;
 	point[1] = 0.;
 	std::cerr << "point:\n" << point;
+#ifdef USE_ATTRIBUTES
 	point.set_attributes(ColorAttributes::BLUE);
+#else
+	point.color() = Color::BLUE;
+#endif
 
 	mobius.add(point);
 	std::cerr << "mobius with one point:\n";
@@ -108,12 +112,20 @@ old_test(Mobius &mobius)
 	Point pt2(mobius.space());
 	pt2[0] = .7;
 	pt2[1] = 0.;
+#ifdef USE_ATTRIBUTES
 	pt2.set_attributes(ColorAttributes::CYAN);
+#else
+	pt2.color() = Color::CYAN;
+#endif
 	mobius.add(pt2);
 	Point pt3(mobius.space());
 	pt3[0] = -.7;
 	pt3[1] = M_PI_4;
+#ifdef USE_ATTRIBUTES
 	pt3.set_attributes(ColorAttributes::MAGENTA);
+#else
+	pt3.color() = Color::MAGENTA;
+#endif
 	mobius.add(pt3);
 	std::cerr << "mobius with three points:\n";
 	std::cerr << mobius;
@@ -132,7 +144,11 @@ old_test(Mobius &mobius)
 	std::cerr << "bond:\n" << bond;
 
 	Polyline polyline(mobius.space(), 41);
+#ifdef USE_ATTRIBUTES
 	polyline.set_attributes(ColorAttributes::GREEN);
+#else
+	polyline.color() = Color::GREEN;
+#endif
 	double center[2];
 	center[0] = 0.;
 	center[1] = 0.;
@@ -140,7 +156,11 @@ old_test(Mobius &mobius)
 	std::cerr << "polyline:\n" << polyline;
 
 	Polygon polygon(mobius.space(), 3);
+#ifdef USE_ATTRIBUTES
 	polygon.set_attributes(ColorAttributes::BLUE);
+#else
+	polygon.color() = Color::BLUE;
+#endif
 	polygon[0][0] = -.5;
 	polygon[0][1] = -.5;
 	polygon[1][0] = -.9;

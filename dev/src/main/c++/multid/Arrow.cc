@@ -31,7 +31,9 @@ ActualArrow::ActualArrow(const Space &space_, std::istream &is)
 void
 ActualArrow::draw(Prims &prims) const
 {
+#ifndef USE_ATTRIBUTES
 	prims.line_color(color);
+#endif
 	if (space().dim() == 2) {
 		double c[10];
 
